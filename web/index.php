@@ -3,7 +3,7 @@
   <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
-  <title>Keepass Test Page</title>
+  <title>KeeLink</title>
   <meta name="Keepass Test Page" content="">
   <meta name="Andrea Cioni" content="">
     
@@ -19,6 +19,7 @@
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/custom.css">
   <link rel="stylesheet" href="css/sweetalert.css">
   <link rel="stylesheet" href="css/pace.css">
   
@@ -72,30 +73,44 @@
   
  </head>
  <body onload="init('<?php echo $randomsid ?>')" >
- 	
-	<!-- Top -->
-	<div style="height:7%;"></div>
- 	
-	 <!-- Center -->
-	 <div>
-		<div style="height:15%"></div>
-		<div class="container">
-		<div class="row">
-			<div class="twelve columns"><p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p></div>
-			<div class="twelve columns">&nbsp;</div>
-			<div class="twelve columns"><div align="center" id="qrcode"></div></div>
-			<div class="twelve columns">&nbsp;</div>
-			<div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div>
+ 	<div class="container">
+		<nav class="navbar">
+			<div class="container">
+				<ul class="navbar-list">
+					<li class="navbar-item"><a class="navbar-link" href="#"> <img src="images/favicon.ico"/> KeeLink</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#howto"> How To</a></li>
+				</ul>
+			</div>
+		</nav>
+		
+		<!-- Center -->
+		<div>
+			<div style="height:15%"></div>
+			<div class="container">
+				<div class="row"><div class="twelve columns"><p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p></div>	</div>
+				
+				<div class="row"><div class="twelve columns">&nbsp;</div></div>
+				
+				<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
+				
+				<div class="row"><div class="twelve columns">&nbsp;</div></div>
+				
+				<div class="row"><div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div></div>
+			</div>
 		</div>
+		
+		<div id="howto" class="container docs-section">
+			<h1>How To</h1>
+		</div>
+		
+		<div class="container docs-section"></div>
+		
+		<!-- Footer -->
+		<div class="container docs-section">
+			<div class="row" style="height: 200px;">
+				<div class="twelve columns"><p style="font-size: 58px;font-weight: bold;color: red;"align="center"></p></div>
+			</div>
 		</div>
 	</div>
-	
-	<!-- Footer -->
-	<div class="container">
-		<div class="row" style="height: 200px;">
-			<div class="twelve columns"><p style="font-size: 58px;font-weight: bold;color: red;"align="center"></p></div>
-		</div>
-	</div>
-
  </body>
 </html>
