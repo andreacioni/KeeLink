@@ -3,6 +3,7 @@ const REQUEST_INTERVAL = 1500;
 
 var _sid;
 var invalidateSid = false;
+var passwordReceived = false;
 var pollingInterval;
 
 function init(sid) {
@@ -23,7 +24,7 @@ function initAsyncAjaxRequest() {
 function passwordLooker() {
 	if(!invalidateSid) {
 		$.post("getpassforsid.php",{'sid':_sid},onSuccess,"text");
-	} else {
+	} else if(!passwordReceived){
 		invalidateSession(); 
 		alertWarn("No password received...","No password was received in the last minute, reload page to start a new session");
 	}
@@ -87,6 +88,7 @@ function copyPasswordToClipboard(psw) {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data != "ERROR") {
+		passwordReceived = true;
 		alertSuccess("Password received!","Your password was saved in clipboard, paste it where you want");
 		console.log("Password: " + data)
 		invalidateSession();

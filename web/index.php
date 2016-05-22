@@ -66,45 +66,8 @@
   
   
   <?php
-  
-  	$randomsid = getSid();
-	
-	function getSid() {
-		return hash("md5",openssl_random_pseudo_bytes(256));
-	}
-	
-	function saveSid($sid) {
-		$servername = "localhost";
-		$username = "andysite";
-		$password = "";
-		$dbname = "my_andysite";
-
-		// Create connection
-		$conn = new mysqli($servername, $username, $password, $dbname);
-		// Check connection
-		if ($conn->connect_error) {
-			die("Connection failed: " . $conn->connect_error);
-		}
-		
-		$sqlInsert = "INSERT INTO `KEEPASS`(`SESSION_ID`) VALUES ('" . $sid . "')";
-		$sqlDelete = "DELETE FROM `KEEPASS` WHERE DATE_ADD(`CREATION_DATE`,INTERVAL 2 MINUTE) < NOW() ";
-		
-		if ($conn->query($sqlDelete) === TRUE) {
-			//echo "<br>Old records deleted";
-		} else {
-			echo "<br>Error: " . $sqlDelete . "<br>" . $conn->error;
-		}
-
-		if ($conn->query($sqlInsert) === TRUE) {
-			//echo "<br>New record created successfully";
-		} else {
-			echo "<br>Error: " . $sqlInsert . "<br>" . $conn->error;
-		}
-
-		$conn->close();
-	}
-	
-	saveSid($randomsid);
+  	require('lib/php/keelink.php');
+  	$randomsid = KeeLink::initNewSession();
   ?>
   
  </head>
