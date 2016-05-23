@@ -16,10 +16,10 @@ class KeeLink {
 		$sqlDelete = "DELETE FROM `KEEPASS` WHERE DATE_ADD(`CREATION_DATE`,INTERVAL 2 MINUTE) < NOW() ";
 		
 		if ($conn->query($sqlDelete) === FALSE) {
-			echo "Error: " . $sqlDelete . " ---> " . $conn->error;
+			echo "Error: " . $conn->error;
         }
 		if ($conn->query($sqlInsert) === FALSE) {
-			echo "Error: " . $sqlInsert . " ---> " . $conn->error;
+			echo "Error: " . $conn->error;
         }
 
 		$conn->close();

@@ -5,6 +5,14 @@ var _sid;
 var invalidateSid = false;
 var pollingInterval;
 
+var root = $('html, body');
+$('a').click(function(){
+    root.animate({
+        scrollTop: $( $(this).attr('href') ).offset().top
+    }, 500);
+    return false;
+});
+
 function init(sid) {
 	_sid = sid;
 	if(!checkBrowserSupport()) {
@@ -16,7 +24,7 @@ function init(sid) {
 }
 
 function initAsyncAjaxRequest() {
-	pollingInterva = setInterval(passwordLooker, REQUEST_INTERVAL);
+	pollingInterval = setInterval(passwordLooker, REQUEST_INTERVAL);
 	setTimeout(function () {invalidateSid = true},INVALIDATE_TIMEOUT_SEC * 1000);
 }
 
@@ -35,7 +43,7 @@ function initClipboardButton() {
 
 function initQrCode() {
 	var qrcode = new QRCode(document.getElementById("qrcode"), {
-		text: _sid,
+		text: "ksid://" + _sid,
 		width: 200,
 		height: 200,
 		colorDark : "#000000",
@@ -66,7 +74,7 @@ function alertWarn(title,msg) {
 	swal({
 	  title: title,
 	  text: msg,
-	  type: "warn"
+	  type: "warning"
 	});
 }
 

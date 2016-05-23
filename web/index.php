@@ -77,30 +77,43 @@
 		<nav class="navbar">
 			<div class="container">
 				<ul class="navbar-list">
-					<li class="navbar-item"><a class="navbar-link" href="#"> <img src="images/favicon.ico"/> KeeLink</a></li>
-					<li class="navbar-item"><a class="navbar-link" href="#howto"> How To</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#" id="ancho1"> <img src="images/favicon.ico"/> KeeLink</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#howto" id="ancho2"> How To</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#credits" id="ancho3">Credits</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#donate" id="ancho4">Donate</a></li>
 				</ul>
 			</div>
 		</nav>
 		
 		<!-- Center -->
-		<div>
-			<div style="height:15%"></div>
-			<div class="container">
-				<div class="row"><div class="twelve columns"><p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p></div>	</div>
-				
-				<div class="row"><div class="twelve columns">&nbsp;</div></div>
-				
-				<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
-				
-				<div class="row"><div class="twelve columns">&nbsp;</div></div>
-				
-				<div class="row"><div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div></div>
-			</div>
+
+		<div style="height:15%"></div>
+		<div class="container">
+			<div class="row"><div class="twelve columns"><p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p></div>	</div>
+			
+			<div class="row"><div class="twelve columns">&nbsp;</div></div>
+			
+			<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
+			
+			<div class="row"><div class="twelve columns">&nbsp;</div></div>
+			
+			<div class="row"><div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div></div>
+		
+			<div class="row"><div class="twelve columns">&nbsp;</div></div>
+			
 		</div>
+
 		
 		<div id="howto" class="container docs-section">
-			<h1>How To</h1>
+			<h2>How To</h2>
+		</div>
+		
+		<div id="credits" class="container docs-section">
+			<h2>Credits</h2>
+		</div>
+		
+		<div id="donate" class="container docs-section">
+			<h2>Donate</h2>
 		</div>
 		
 		<div class="container docs-section"></div>
