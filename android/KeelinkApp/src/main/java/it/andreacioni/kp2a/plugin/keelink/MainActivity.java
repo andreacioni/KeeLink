@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
 
-                new IntentIntegrator(activity).initiateScan();
+                startScanActivity();
             }
         });
 
@@ -108,4 +108,11 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this,"No network connection available!",Toast.LENGTH_SHORT);
 
         }
+
+    private void startScanActivity() {
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.setCaptureActivity(CustomCaptureActivity.class);
+        integrator.setOrientationLocked(false);
+        integrator.initiateScan();
+    }
 }

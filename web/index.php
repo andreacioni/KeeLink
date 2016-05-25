@@ -60,7 +60,7 @@
   <script type="text/javascript" src="lib/pace.js"></script>
   <script type="text/javascript" src="lib/jquery.min.js"></script>
   <script type="text/javascript" src="lib/qrcode.js"></script>
-  <script type="text/javascript" src="lib/sweetalert.min.js"></script>
+  <script type="text/javascript" src="lib/sweetalert/sweetalert-dev.js"></script>
   <script type="text/javascript" src="lib/clipboard.min.js"></script>
 
   <script type="text/javascript" src="lib/main.js"></script>
