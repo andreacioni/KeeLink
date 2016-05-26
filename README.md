@@ -1,5 +1,6 @@
 # KeeLink
-Keepass2Android QR Plug-In Utility
+<img src="https://travis-ci.org/andreacioni/KeeLink.svg?branch=master"/>
+<p>Keepass2Android QR Plug-In Utility</p>
 
 <p>Started on: 21/5/2016</p>
 
