@@ -1,0 +1,5 @@
+language android
+script:
+  - cd android
+  - ./gradlew.bat
+
