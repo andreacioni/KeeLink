@@ -1,11 +1,12 @@
-<?php 
+<?php
+$CONFIG_INI = $_SERVER["DOCUMENT_ROOT"].'/private/config.ini';
 
 class KeeLink {
     
-    const _servername = "localhost";
-	const _username = "andysite";
+    const _servername = "sql105.freecluster.eu";
+	const _username = "fceu_18192012";
 	const _password = "";
-	const _dbname = "my_andysite";
+	const _dbname = "fceu_18192012_keelink";
     
     static public function initNewSession() {
         $sid = KeeLink::generateSid();
@@ -71,7 +72,7 @@ class KeeLink {
     
     static private function getConnection() {
         // Create connection
-		$conn = new mysqli(self::_servername, self::_username, self::_password, self::_dbname);
+		$conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname']);
 		// Check connection
 		if ($conn->connect_error)
 			die("Connection failed: " . $conn->connect_error);

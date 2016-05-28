@@ -5,16 +5,18 @@ var _sid;
 var invalidateSid = false;
 var pollingInterval;
 
-var root = $('html, body');
-$('a').click(function(){
-    root.animate({
-        scrollTop: $( $(this).attr('href') ).offset().top
-    }, 500);
-    return false;
-});
-
 function init(sid) {
 	_sid = sid;
+	
+	var root = $('html, body');
+	$('a').click(function(event){
+		event.preventDefault();
+		root.animate({
+			scrollTop: $( $(this).attr('href') ).offset().top
+		}, 500);
+		return false;
+	});
+	
 	if(!checkBrowserSupport()) {
 		alertError("Your browser is up to date, please use newer browser");
 	} else {

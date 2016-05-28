@@ -44,6 +44,12 @@
 		border-width: 8px;
 	}
 	
+	#content{
+		margin-top: 100px;
+		z-index: 0;
+		position: absolute;
+	}
+	
 	.content-font {
 		color:  #363533;
 		font-size: 30px;
@@ -62,6 +68,7 @@
   <script type="text/javascript" src="lib/qrcode.js"></script>
   <script type="text/javascript" src="lib/sweetalert/sweetalert-dev.js"></script>
   <script type="text/javascript" src="lib/clipboard.min.js"></script>
+  <script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
 
   <script type="text/javascript" src="lib/main.js"></script>
   
@@ -74,54 +81,57 @@
  </head>
  <body onload="init('<?php echo $randomsid ?>')" >
  	<div class="container">
+		 
+		 <!-- Navigationbar -->
 		<nav class="navbar">
 			<div class="container">
 				<ul class="navbar-list">
-					<li class="navbar-item"><a class="navbar-link" href="#" id="ancho1"> <img src="images/favicon.ico"/> KeeLink</a></li>
-					<li class="navbar-item"><a class="navbar-link" href="#howto" id="ancho2"> How To</a></li>
-					<li class="navbar-item"><a class="navbar-link" href="#credits" id="ancho3">Credits</a></li>
-					<li class="navbar-item"><a class="navbar-link" href="#donate" id="ancho4">Donate</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#"> <img src="images/favicon.ico"/> KeeLink</a></li>
+					<li class="navbar-item"><a class="navbar-link anchorLink" href="#howto"> How To</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#credits">Credits</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#donate">Donate</a></li>
 				</ul>
 			</div>
 		</nav>
 		
 		<!-- Center -->
+		<div id="content">
+			<div style="height:15%"></div>
+			<div class="container">
+				<div class="row"><div class="twelve columns"><p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p></div>	</div>
+				
+				<div class="row"><div class="twelve columns">&nbsp;</div></div>
+				
+				<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
+				
+				<div class="row"><div class="twelve columns">&nbsp;</div></div>
+				
+				<div class="row"><div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div></div>
+			
+				<div class="row"><div class="twelve columns">&nbsp;</div></div>
+				
+			</div>
 
-		<div style="height:15%"></div>
-		<div class="container">
-			<div class="row"><div class="twelve columns"><p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p></div>	</div>
 			
-			<div class="row"><div class="twelve columns">&nbsp;</div></div>
+			<div id="howto" class="container docs-section">
+				<h2>How To</h2>
+			</div>
 			
-			<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
+			<div id="credits" class="container docs-section">
+				<h2>Credits</h2>
+			</div>
 			
-			<div class="row"><div class="twelve columns">&nbsp;</div></div>
+			<div id="donate" class="container docs-section">
+				<h2>Donate</h2>
+			</div>
 			
-			<div class="row"><div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div></div>
-		
-			<div class="row"><div class="twelve columns">&nbsp;</div></div>
+			<div class="container docs-section"></div>
 			
-		</div>
-
-		
-		<div id="howto" class="container docs-section">
-			<h2>How To</h2>
-		</div>
-		
-		<div id="credits" class="container docs-section">
-			<h2>Credits</h2>
-		</div>
-		
-		<div id="donate" class="container docs-section">
-			<h2>Donate</h2>
-		</div>
-		
-		<div class="container docs-section"></div>
-		
-		<!-- Footer -->
-		<div class="container docs-section">
-			<div class="row" style="height: 200px;">
-				<div class="twelve columns"><p style="font-size: 58px;font-weight: bold;color: red;"align="center"></p></div>
+			<!-- Footer -->
+			<div class="container docs-section">
+				<div class="row" style="height: 200px;">
+					<div class="twelve columns"><p style="font-size: 58px;font-weight: bold;color: red;"align="center"></p></div>
+				</div>
 			</div>
 		</div>
 	</div>
