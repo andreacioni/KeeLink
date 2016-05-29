@@ -1,3 +1,35 @@
+#qrcode {
+    transition-property: opacity;
+    transition-duration: 1.15s;
+    transition-timing-function: ease;
+    transition-delay: 0s;
+  transition-property: opacity;
+  transition-duration: 1.15s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
+  opacity: 0;
+  z-index: 1; 
+}
+
+
+#qrcode img {
+  border-style: solid;
+  border-color: white;
+  border-width: 8px;
+}
+
+#content{
+  margin-top: 100px;
+  z-index: 0;
+  position: absolute;
+}
+
+.content-font {
+  color:  #363533;
+  font-size: 30px;
+}
+
+
 .container {
   max-width: 800px; }
 .header {

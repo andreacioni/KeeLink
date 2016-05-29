@@ -1,30 +1,51 @@
 <?php
 session_start();
 
+header("Content Type: application/json");
+
 class KeeLink {
     
+    const JSON_RESPONSE = "{
+        'status':false,
+        'message':'null',
+        'chaptaRequired`:false
+    }";
+    
     static public function initNewSession() {
+        
+        $jresp = json_decode(self::JSON_RESPONSE);
+        
         $sid = KeeLink::generateSid();
         
         $conn = KeeLink::getConnection();
+        
+        $chaptaRequired = KeeLink::needChapta($conn);
+        
+        if($chaptaRequired == TRUE)
         
         $sqlInserUser = "INSERT INTO `USER`(`USER_ID`) VALUES ('" . $_SERVER['REMOTE_ADDR'] . "') ON DUPLICATE KEY UPDATE USER.SID_CREATED=USER.SID_CREATED+1 and USER.LAST_ACCESS=CURRENT_TIMESTAMP";
         $sqlInsertSID = "INSERT IGNORE INTO `KEEPASS`(`SESSION_ID`,`USER_ID`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."')";
 		$sqlDelete = "DELETE FROM `KEEPASS` WHERE DATE_ADD(`CREATION_DATE`,INTERVAL 2 MINUTE) < NOW() ";
 		
-		if ($conn->query($sqlDelete) === FALSE) {
-			echo "Error: " . $conn->error;
+		if ($conn->query($sqlDelete) === TRUE) {
+			if ($conn->query($sqlInserUser) === TRUE) {
+                if ($conn->query($sqlInsertSID) === TRUE) {
+                    $jresp['message'] = "Error: " . $conn->error;
+                    $jresp['status'] = true;
+                } else {
+                     $jresp['message'] = "Error: " . $conn->error;
+                }
+            } else {
+                 $jresp['message'] = "Error: " . $conn->error;
+            }
+        } else {
+             $jresp['message'] = "Error: " . $conn->error;
         }
-        if ($conn->query($sqlInserUser) === FALSE) {
-			echo "Error: " . $conn->error;
-        }
-		if ($conn->query($sqlInsertSID) === FALSE) {
-			echo "Error: " . $conn->error;
-        }
+       
 
 		$conn->close();
         
-        return $sid;
+        return json_encode($jresp);
     }
     
     static public function getPasswordForSid($sid) {
@@ -64,6 +85,12 @@ class KeeLink {
 
             $conn->close();
         }
+    }
+    
+    static private function needChapta($conn) {
+        $sqlAccessAttempt = "select SID_CREATED from USER where USER_ID='".$_SERVER['REMOTE_ADDR']."'";
+        $result = $conn->query($sqlAccessAttempt);
+        if ( === TRUE) 
     }
     
     static private function generateSid() {

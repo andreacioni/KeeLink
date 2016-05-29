@@ -22,52 +22,18 @@
   <link rel="stylesheet" href="css/custom.css">
   <link rel="stylesheet" href="css/sweetalert.css">
   <link rel="stylesheet" href="css/pace.css">
-  
-  <style>
-  	#qrcode {
-    	transition-property: opacity;
-    	transition-duration: 1.15s;
-    	transition-timing-function: ease;
-    	transition-delay: 0s;
-		transition-property: opacity;
-		transition-duration: 1.15s;
-		transition-timing-function: ease;
-		transition-delay: 0s;
-		opacity: 0;
-		z-index: 1; 
-	}
-	
-	
-	#qrcode img {
-		border-style: solid;
-		border-color: white;
-		border-width: 8px;
-	}
-	
-	#content{
-		margin-top: 100px;
-		z-index: 0;
-		position: absolute;
-	}
-	
-	.content-font {
-		color:  #363533;
-		font-size: 30px;
-	}
-  
-  </style>
 
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <link rel="icon" type="image/ico" href="images/favicon.ico">
   
   <!-- JS LIBARY -->
-  <script type="text/javascript" src="lib/pace.js"></script>
-  <script type="text/javascript" src="lib/pace.js"></script>
-  <script type="text/javascript" src="lib/jquery.min.js"></script>
-  <script type="text/javascript" src="lib/qrcode.js"></script>
+  <script type="text/javascript" src="lib/pace/pace.js"></script>
+  <script type="text/javascript" src="lib/pace/pace.js"></script>
+  <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="lib/qrcode/qrcode.js"></script>
   <script type="text/javascript" src="lib/sweetalert/sweetalert-dev.js"></script>
-  <script type="text/javascript" src="lib/clipboard.min.js"></script>
+  <script type="text/javascript" src="lib/clipboard/clipboard.min.js"></script>
   <script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
 
   <script type="text/javascript" src="lib/main.js"></script>
