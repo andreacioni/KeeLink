@@ -74,7 +74,7 @@
   
   
   <?php
-  	require('lib/php/keelink.php');
+  	require('keelink.php');
   	$randomsid = KeeLink::initNewSession();
   ?>
   
