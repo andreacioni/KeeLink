@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">KeeLinkApp</string>
     <string name="action_settings">Settings</string>
+
+    <string name="kp2aplugin_title">KeeLink Plugin</string>
+    <string name="kp2aplugin_shortdesc">Send password from Keepass to other devices </string>
+    <string name="kp2aplugin_author">Andrea Cioni</string>
 </resources>

@@ -37,6 +37,14 @@
             android:windowSoftInputMode="stateAlwaysHidden">
 
         </activity>
+
+        <receiver android:name=".Kp2aAccessReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="keepass2android.ACTION_TRIGGER_REQUEST_ACCESS" />
+                <action android:name="keepass2android.ACTION_RECEIVE_ACCESS" />
+                <action android:name="keepass2android.ACTION_REVOKE_ACCESS" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

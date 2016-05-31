@@ -7,4 +7,5 @@ import keepass2android.pluginsdk.PluginActionBroadcastReceiver;
  */
 
 public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
+
 }

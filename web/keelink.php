@@ -1,50 +1,56 @@
 <?php
 session_start();
 
-header("Content Type: application/json");
+header("Content-Type: application/json");
+
+echo KeeLink::initNewSession();
 
 class KeeLink {
     
-    const JSON_RESPONSE = "{
+    /*const JSON_RESPONSE = "{
         'status':false,
         'message':'null',
         'chaptaRequired`:false
-    }";
+    }"; */
+    
+    static public function debug() {
+       echo json_decode(self::JSON_RESPONSE);
+    }
     
     static public function initNewSession() {
         
-        $jresp = json_decode(self::JSON_RESPONSE);
+        $jresp['status'] = false;
         
         $sid = KeeLink::generateSid();
         
         $conn = KeeLink::getConnection();
         
-        $chaptaRequired = KeeLink::needChapta($conn);
-        
-        if($chaptaRequired == TRUE)
-        
-        $sqlInserUser = "INSERT INTO `USER`(`USER_ID`) VALUES ('" . $_SERVER['REMOTE_ADDR'] . "') ON DUPLICATE KEY UPDATE USER.SID_CREATED=USER.SID_CREATED+1 and USER.LAST_ACCESS=CURRENT_TIMESTAMP";
-        $sqlInsertSID = "INSERT IGNORE INTO `KEEPASS`(`SESSION_ID`,`USER_ID`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."')";
-		$sqlDelete = "DELETE FROM `KEEPASS` WHERE DATE_ADD(`CREATION_DATE`,INTERVAL 2 MINUTE) < NOW() ";
-		
-		if ($conn->query($sqlDelete) === TRUE) {
-			if ($conn->query($sqlInserUser) === TRUE) {
-                if ($conn->query($sqlInsertSID) === TRUE) {
-                    $jresp['message'] = "Error: " . $conn->error;
-                    $jresp['status'] = true;
+        $jresp['chaptaRequired'] = KeeLink::needChapta($conn);
+
+        if($jresp['chaptaRequired'] === TRUE) {
+            $jresp['message'] = "Error(4): Chapta required";
+        } else {
+            $sqlInserUser = "INSERT INTO `USER`(`USER_ID`) VALUES ('" . $_SERVER['REMOTE_ADDR'] . "') ON DUPLICATE KEY UPDATE USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
+            $sqlInsertSID = "INSERT IGNORE INTO `KEEPASS`(`SESSION_ID`,`USER_ID`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."')";
+            $sqlDelete = "DELETE FROM `KEEPASS` WHERE DATE_ADD(`CREATION_DATE`,INTERVAL 2 MINUTE) < NOW() ";
+            
+            if ($conn->query($sqlDelete) === TRUE) {
+                if ($conn->query($sqlInserUser) === TRUE) {
+                    if ($conn->query($sqlInsertSID) === TRUE) {
+                        $jresp['status'] = TRUE;
+                        $jresp['message'] = $sid;
+                    } else {
+                        $jresp['message'] = "Error(2): " . $conn->error;
+                    }
                 } else {
-                     $jresp['message'] = "Error: " . $conn->error;
+                    $jresp['message'] = "Error(3): " . $conn->error;
                 }
             } else {
-                 $jresp['message'] = "Error: " . $conn->error;
+                $jresp['message'] = "Error(1): " . $conn->error;
             }
-        } else {
-             $jresp['message'] = "Error: " . $conn->error;
         }
-       
 
 		$conn->close();
-        
         return json_encode($jresp);
     }
     
@@ -90,7 +96,13 @@ class KeeLink {
     static private function needChapta($conn) {
         $sqlAccessAttempt = "select SID_CREATED from USER where USER_ID='".$_SERVER['REMOTE_ADDR']."'";
         $result = $conn->query($sqlAccessAttempt);
-        if ( === TRUE) 
+        if ($result->num_rows == 1) {
+            $attempts = $result->fetch_assoc()["SID_CREATED"];
+            if($attempts > 5)
+                return TRUE;
+        } 
+        
+        return FALSE;
     }
     
     static private function generateSid() {

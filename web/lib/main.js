@@ -1,5 +1,5 @@
 const INVALIDATE_TIMEOUT_SEC = 50;
-const REQUEST_INTERVAL = 1500;
+const REQUEST_INTERVAL = 2000;
 
 var _sid;
 var invalidateSid = false;

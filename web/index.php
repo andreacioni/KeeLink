@@ -68,7 +68,7 @@
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
-				<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
+				<div class="row"><div class="twelve columns"><div height="200" width="200" align="center" id="qrcode"></div></div></div>
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
