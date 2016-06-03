@@ -14,7 +14,7 @@ class KeeLink {
     }"; */
     
     static public function debug() {
-       echo json_decode(self::JSON_RESPONSE);
+       
     }
     
     static public function initNewSession() {

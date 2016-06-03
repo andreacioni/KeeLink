@@ -25,6 +25,10 @@ public class KeeLink {
     }
 
     public boolean checkNetworkConnection() {
+        return checkNetworkConnection(ctx);
+    }
+
+    public static boolean checkNetworkConnection(Context ctx) {
         ConnectivityManager connMgr = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 

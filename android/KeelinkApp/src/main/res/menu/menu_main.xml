@@ -2,6 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="it.andreacioni.kp2a.plugin.keelink.MainActivity">
+    <item android:id="@+id/disable_plugin"
+        android:title="@string/disable_as_plugin"
+        android:visible="false" />
+    <item android:title="@string/enable_as_plugin"
+        android:id="@+id/enable_plugin" />
     <item android:id="@+id/action_settings" android:orderInCategory="100"
         android:title="@string/action_settings" app:showAsAction="never" />
+    <item android:title="@string/about"
+        android:id="@+id/about" />
 </menu>

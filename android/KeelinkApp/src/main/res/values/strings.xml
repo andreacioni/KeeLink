@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">KeeLinkApp</string>
+    <string name="app_name">KeeLink</string>
     <string name="action_settings">Settings</string>
+    <string name="enable_as_plugin">Enable</string>
+    <string name="disable_as_plugin">Disable</string>
+    <string name="about">About</string>
 
     <string name="kp2aplugin_title">KeeLink Plugin</string>
     <string name="kp2aplugin_shortdesc">Send password from Keepass to other devices </string>
     <string name="kp2aplugin_author">Andrea Cioni</string>
+
+    <string name="kp2aplugin_menu_entry">Send</string>
+
+    <string name="kp2aplugin_loading_entry">Processing</string>
 </resources>
