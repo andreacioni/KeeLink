@@ -53,7 +53,6 @@ function initClipboardButton(password) {
 	$("#copyBtn").show();
 	$("#copyBtn").attr("data-clipboard-text",password);
 	new Clipboard('#copyBtn');
-	$("#copyBtn").click();
 }
 
 function initQrCode() {
@@ -74,6 +73,8 @@ function alertSuccess(title,msg) {
 	  title: title,
 	  text: msg,
 	  type: "success"
+	},function() {
+		$("#copyBtn").click();
 	});
 }
 
@@ -105,19 +106,17 @@ function checkBrowserSupport(params) {
 	return "XMLHttpRequest" in window;
 }
 
-function copyPasswordToClipboard(psw) {
-}
-
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
 		initClipboardButton(data.message);
 		alertSuccess("Password received!","Your password was saved in clipboard, paste it where you want");
+		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
 	}
 }
 
 function onFail(data,textStatus,jqXhr) {
-	alertError("Comunication Failure","Are you connected to internet?")
+	alertError("Comunication Failure","Are you connected to Internet?")
 }
 
 function invalidateSession() {

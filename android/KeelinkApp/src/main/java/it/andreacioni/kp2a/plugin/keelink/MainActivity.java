@@ -21,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import keepass2android.pluginsdk.AccessManager;
+import keepass2android.pluginsdk.KeepassDefs;
 import keepass2android.pluginsdk.Strings;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,12 +57,16 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = getIntent();
                 if ((i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
                         (i.getStringExtra(Strings.EXTRA_FIELD_ID) != null) &&
-                        (i.getStringExtra(Strings.EXTRA_SENDER) != null)) {
+                        (i.getStringExtra(Strings.EXTRA_SENDER) != null) &&
+                        i.getStringExtra(Strings.EXTRA_ENTRY_ID) != null) {
+
                     Log.d(TAG, i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
+                    Log.d(TAG, "GUID Entry: " + i.getStringExtra(Strings.EXTRA_ENTRY_ID));
+
                     try {
-                        passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString("Password");
+                        passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString(KeepassDefs.PasswordField);
                     } catch (JSONException e) {
-                        Log.e(TAG, "Password parsing error");
+                        Log.e(TAG, "Password parsing error" + e.getMessage());
                     }
                     progressDialog.show();
                     new DelayedLauncher(progressDialog).execute((Object[]) null);
@@ -80,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
 
         if(passwordReceived != null) {
-            outState.putString(Strings.EXTRA_ENTRY_OUTPUT_DATA, "pippa");
+            outState.putString(Strings.EXTRA_ENTRY_OUTPUT_DATA, passwordReceived);
             //outState.putString(Strings.EXTRA_FIELD_ID, launcherIntent.getStringExtra(Strings.EXTRA_FIELD_ID));
             //outState.putString(Strings.EXTRA_SENDER, launcherIntent.getStringExtra(Strings.EXTRA_SENDER));
         }
@@ -187,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                 if (content.startsWith(KeeLink.QR_CODE_PREFIX)) {
                     content = content.substring(KeeLink.QR_CODE_PREFIX.length());
                     Log.d(TAG, "Valid code scanned:" + content);
-                    validSidReceived(content,"pippo");
+                    validSidReceived(content,passwordReceived);
                 } else {
                     Log.e(TAG, "Invalid code:" + content);
                     Toast.makeText(this, "Invalid QR code scanned!", Toast.LENGTH_SHORT).show();

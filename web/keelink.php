@@ -64,6 +64,29 @@ class KeeLink {
         return json_encode($jresp);
     }
     
+    static public function removeEntry($sid) {
+        $jresp['status'] = FALSE;
+        
+        if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
+            $jresp['message'] = "Invalid parameter passed (7)";
+        } else {
+            $conn = KeeLink::getConnection();
+            
+            $sql = "DELETE FROM KEEPASS WHERE SESSION_ID='".$sid."'";
+            
+            if ($conn->query($sql) === TRUE) {
+                $jresp['message'] = "OK";
+                $jresp['status'] = TRUE;
+            } else {
+                $jresp['message'] = "Error fetching password (8)";
+            }
+
+            $conn->close();	
+        }
+        
+        return json_encode($jresp);
+    }
+    
     static public function setPasswordForSid($sid,$psw) {
         $jresp['status'] = FALSE;
         
