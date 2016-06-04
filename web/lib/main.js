@@ -5,24 +5,34 @@ var _sid;
 var invalidateSid = false;
 var pollingInterval;
 
-function init(sid) {
-	_sid = sid;
+function init() {
+	$.post("init.php",{},
+		function(data) {
+			if(data.status === true) {
+				_sid = data['message'];
+				
+				if(!checkBrowserSupport()) {
+					alertError("Your browser is up to date, please use newer browser");
+				} else {
+					$("#sidLabel").text(_sid);
+					initQrCode();
+					initAsyncAjaxRequest();
+				}
+			} else {
+				alertError("Cannot initialize KeeLink",data.message);
+			}
+		}
+	,"json");
 	
-	var root = $('html, body');
+	//Enable scrolling effect on anchor clicking
+	var _root = $('html, body');
 	$('a').click(function(event){
 		event.preventDefault();
-		root.animate({
+		_root.animate({
 			scrollTop: $( $(this).attr('href') ).offset().top
 		}, 500);
 		return false;
 	});
-	
-	if(!checkBrowserSupport()) {
-		alertError("Your browser is up to date, please use newer browser");
-	} else {
-		initQrCode();
-		initAsyncAjaxRequest();
-	}
 }
 
 function initAsyncAjaxRequest() {
@@ -32,15 +42,18 @@ function initAsyncAjaxRequest() {
 
 function passwordLooker() {
 	if(!invalidateSid) {
-		$.post("getpassforsid.php",{'sid':_sid},onSuccess,"text");
+		$.post("getpassforsid.php",{'sid':_sid},onSuccess,"json");
 	} else {
 		invalidateSession(); 
 		alertWarn("No password received...","No password was received in the last minute, reload page to start a new session");
 	}
 }
 
-function initClipboardButton() {
-	new Clipboard('.btn');
+function initClipboardButton(password) {
+	$("#copyBtn").show();
+	$("#copyBtn").attr("data-clipboard-text",password);
+	new Clipboard('#copyBtn');
+	$("#copyBtn").click();
 }
 
 function initQrCode() {
@@ -96,9 +109,9 @@ function copyPasswordToClipboard(psw) {
 }
 
 function onSuccess(data,textStatus,jqXhr) {
-	if(data != undefined && data != "ERROR") {
+	if(data != undefined && data.status === true) {
+		initClipboardButton(data.message);
 		alertSuccess("Password received!","Your password was saved in clipboard, paste it where you want");
-		console.log("Password: " + data)
 		invalidateSession();
 	}
 }

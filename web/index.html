@@ -38,14 +38,8 @@
 
   <script type="text/javascript" src="lib/main.js"></script>
   
-  
-  <?php
-  	require('keelink.php');
-  	$randomsid = KeeLink::initNewSession();
-  ?>
-  
  </head>
- <body onload="init('<?php echo $randomsid ?>')" >
+ <body onload="init()" >
  	<div class="container">
 		 
 		 <!-- Navigationbar -->
@@ -72,7 +66,12 @@
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
-				<div class="row"><div class="twelve columns"><p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"><?php echo $randomsid; ?></span></b></p></div></div>
+				<div class="row">
+					<div class="twelve columns">
+						<p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"></span></b></p>
+						<p class="content-font" align="center"><button id="copyBtn" data-clipboard-text="no password" hidden>Copy to clipboard</button></p>
+					</div>
+				</div>
 			
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
@@ -81,14 +80,26 @@
 			
 			<div id="howto" class="container docs-section">
 				<h2>How To</h2>
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
+					
+				</p>
 			</div>
 			
 			<div id="credits" class="container docs-section">
 				<h2>Credits</h2>
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
+					
+				</p>
 			</div>
 			
 			<div id="donate" class="container docs-section">
 				<h2>Donate</h2>
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
+					
+				</p>
 			</div>
 			
 			<div class="container docs-section"></div>

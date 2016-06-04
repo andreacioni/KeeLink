@@ -3,19 +3,7 @@ session_start();
 
 header("Content-Type: application/json");
 
-echo KeeLink::initNewSession();
-
 class KeeLink {
-    
-    /*const JSON_RESPONSE = "{
-        'status':false,
-        'message':'null',
-        'chaptaRequired`:false
-    }"; */
-    
-    static public function debug() {
-       
-    }
     
     static public function initNewSession() {
         
@@ -32,21 +20,16 @@ class KeeLink {
         } else {
             $sqlInserUser = "INSERT INTO `USER`(`USER_ID`) VALUES ('" . $_SERVER['REMOTE_ADDR'] . "') ON DUPLICATE KEY UPDATE USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
             $sqlInsertSID = "INSERT IGNORE INTO `KEEPASS`(`SESSION_ID`,`USER_ID`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."')";
-            $sqlDelete = "DELETE FROM `KEEPASS` WHERE DATE_ADD(`CREATION_DATE`,INTERVAL 2 MINUTE) < NOW() ";
             
-            if ($conn->query($sqlDelete) === TRUE) {
-                if ($conn->query($sqlInserUser) === TRUE) {
-                    if ($conn->query($sqlInsertSID) === TRUE) {
-                        $jresp['status'] = TRUE;
-                        $jresp['message'] = $sid;
-                    } else {
-                        $jresp['message'] = "Error(2): " . $conn->error;
-                    }
+            if ($conn->query($sqlInserUser) === TRUE) {
+                if ($conn->query($sqlInsertSID) === TRUE) {
+                    $jresp['status'] = TRUE;
+                    $jresp['message'] = $sid;
                 } else {
-                    $jresp['message'] = "Error(3): " . $conn->error;
+                    $jresp['message'] = "Error(2): " . $conn->error;
                 }
             } else {
-                $jresp['message'] = "Error(1): " . $conn->error;
+                $jresp['message'] = "Error(3): " . $conn->error;
             }
         }
 
@@ -55,8 +38,10 @@ class KeeLink {
     }
     
     static public function getPasswordForSid($sid) {
+        $jresp['status'] = FALSE;
+        
         if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-            echo "Invalid parameter passed";
+            $jresp['message'] = "Invalid parameter passed (1)";
         } else {
             $conn = KeeLink::getConnection();
             
@@ -66,31 +51,40 @@ class KeeLink {
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 $_SESSION["generatedSid"] = NULL;
-                echo $row['PSW'];
+                
+                $jresp['message'] = $row['PSW'];
+                $jresp['status'] = TRUE;
             } else {
-                echo "ERROR";
+                $jresp['message'] = "Error fetching password (4)";
             }
 
             $conn->close();	
         }
+        
+        return json_encode($jresp);
     }
     
     static public function setPasswordForSid($sid,$psw) {
+        $jresp['status'] = FALSE;
+        
         if($sid === NULL || $psw === NULL) {
-            echo "Invalid parameter passed";
+            $jresp['message'] = "Invalid parameter passed (5)";
         } else {
             $conn = KeeLink::getConnection();
             
             $sql = "UPDATE KEEPASS set PSW ='".$psw."' where SESSION_ID='".$sid."' and PSW is null";
             
             if (($conn->query($sql) === TRUE) && ($conn->affected_rows == 1)) {
-                echo "OK";
+                $jresp['message'] = "OK";
+                $jresp['status'] = TRUE;
             } else {
-                echo "Error: " . $sql . " " . $conn->error;
+                $jresp['message'] = "SQL Error (6): " . $conn->error;
             }
 
             $conn->close();
         }
+        
+        return json_encode($jresp);
     }
     
     static private function needChapta($conn) {

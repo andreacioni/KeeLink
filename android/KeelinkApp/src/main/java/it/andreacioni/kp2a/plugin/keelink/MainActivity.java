@@ -51,22 +51,25 @@ public class MainActivity extends AppCompatActivity {
 
         boolean status = snackStatusShow();
 
-        if(status && savedInstanceState == null) { //last condition ensure that the capture activity starts correctly TODO check this solution...
-            Intent i = getIntent();
-            if((i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
-                    (i.getStringExtra(Strings.EXTRA_FIELD_ID) != null) &&
-                    (i.getStringExtra(Strings.EXTRA_SENDER) != null)) {
-                Log.d(TAG,i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
-                try {
-                    passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString("Password");
-                } catch (JSONException e) {
-                    Log.e(TAG,"Password parsing error");
+        if(status) { //last condition ensure that the capture activity starts correctly TODO check this solution...
+            if(savedInstanceState == null) {
+                Intent i = getIntent();
+                if ((i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
+                        (i.getStringExtra(Strings.EXTRA_FIELD_ID) != null) &&
+                        (i.getStringExtra(Strings.EXTRA_SENDER) != null)) {
+                    Log.d(TAG, i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
+                    try {
+                        passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString("Password");
+                    } catch (JSONException e) {
+                        Log.e(TAG, "Password parsing error");
+                    }
+                    progressDialog.show();
+                    new DelayedLauncher(progressDialog).execute((Object[]) null);
                 }
-                progressDialog.show();
-                new DelayedLauncher(progressDialog).execute((Object[]) null);
+
+            } else {
+                passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
             }
-        } else {
-            passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
         }
 
 
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void validSidReceived(String sid,String password) {
 
-        if(keeLink.checkNetworkConnection()) {
+        if(snackStatusShow()) {
             keeLink.sendKey(sid, password, new AsyncPostResponse() {
                 @Override
                 public void response(boolean result) {

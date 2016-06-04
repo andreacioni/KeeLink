@@ -3,6 +3,9 @@ package it.andreacioni.kp2a.plugin.keelink;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -17,6 +20,8 @@ import java.util.List;
  * Created by andreacioni on 21/05/16.
  */
 class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
+
+    private static final String TAG = AsyncPostTask.class.getSimpleName();
 
     private static final String USER_AGENT = "Mozilla/5.0";
 
@@ -42,6 +47,8 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
     }
 
     private boolean sendThroughStd(String targetSite,String sid,String key) {
+
+        boolean ret = false;
 
         String url = targetSite + "/updatepsw.php";
         StringBuffer response = null;
@@ -78,20 +85,29 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
             }
             in.close();
         } catch (IOException e) {
-            Log.e(this.getClass().getSimpleName(), "General IO exception:" + e.getMessage());
+            Log.e(TAG, "General IO exception:" + e.getMessage());
         }
 
 
         if(response == null) {
-            Log.e(this.getClass().getSimpleName(), "Null response received");
-
-            return false;
+            Log.e(TAG, "Null response received");
         } else {
-            Log.d(this.getClass().getSimpleName(), "Response code: " + responseCode + " Response: " + response.toString());
+            Log.d(TAG, "Response code: " + responseCode + " Response: " + response.toString());
 
-            return (responseCode == 200) && "OK".equals(response.toString());
+            if(responseCode == 200) {
+                try {
+                    JSONObject jObj  = new JSONObject(response.toString());
+                    Log.d(TAG,jObj.toString());
+                    Boolean b = jObj.getBoolean("status");
+                    ret = (b!=null) && b;
+                } catch (JSONException e) {
+                    Log.e(TAG,"JSON parsing exception: " + e.getMessage());
+                }
+
+            }
         }
 
+        return ret;
     }
 
 }

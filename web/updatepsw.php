@@ -4,6 +4,6 @@
 	$sid = $_POST["sid"];
 	$psw = $_POST["key"];
 	
-	KeeLink::setPasswordForSid($sid,$psw);
+	echo KeeLink::setPasswordForSid($sid,$psw);
 
 ?>

@@ -9,7 +9,7 @@ import android.net.NetworkInfo;
  */
 public class KeeLink {
 
-    private static final String TARGET_SITE = "http://www.andysite.altervista.org/keepass";
+    private static final String TARGET_SITE = "http://andysite.altervista.org/keepass";
 
     public static final String QR_CODE_PREFIX = "ksid://";
 
