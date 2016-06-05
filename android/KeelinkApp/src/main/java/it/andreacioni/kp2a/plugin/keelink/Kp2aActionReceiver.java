@@ -32,7 +32,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
                     R.drawable.send_keelink, null);
 
             for (String field: oe.getEntryFields().keySet()) {
-                oe.addEntryFieldAction("keepass2android.plugin.qr.show", Strings.PREFIX_STRING+field, oe.getContext().getString(R.string.kp2aplugin_menu_entry),
+                oe.addEntryFieldAction("keepass2android.keelink.send", Strings.PREFIX_STRING+field, oe.getContext().getString(R.string.kp2aplugin_menu_entry),
                         R.drawable.send_keelink, null);
             }
 

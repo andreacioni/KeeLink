@@ -109,7 +109,7 @@ function checkBrowserSupport(params) {
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
 		initClipboardButton(data.message);
-		alertSuccess("Password received!","Your password was saved in clipboard, paste it where you want");
+		alertSuccess("Password received!","Your password was saved in clipboard, paste it where you want!");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
 	}
@@ -124,5 +124,5 @@ function invalidateSession() {
 	clearInterval(pollingInterval);
 	_sid = null;
 	$("#sidLabel").css("text-decoration", "line-through");
-	$("#qrcode").css("filter", "blur(4px)");
+	$("#qrcode").css("filter", "blur(2px)");
 }

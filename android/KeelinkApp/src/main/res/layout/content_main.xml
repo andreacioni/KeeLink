@@ -8,10 +8,13 @@
     tools:context="it.andreacioni.kp2a.plugin.keelink.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="Hello World!" app:layout_constraintBottom_toBottomOf="@+id/content_main"
-        app:layout_constraintLeft_toLeftOf="@+id/content_main"
-        app:layout_constraintRight_toRightOf="@+id/content_main"
-        app:layout_constraintTop_toTopOf="@+id/content_main" />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"
+        android:id="@+id/recent_list"
+        android:listSelector="@color/gray_btn_bg_color"
+        android:stateListAnimator="@anim/modal_in"
+        android:background="@color/background_floating_material_light" />
 
 </android.support.constraint.ConstraintLayout>

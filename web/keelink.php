@@ -13,7 +13,7 @@ class KeeLink {
         
         $conn = KeeLink::getConnection();
         
-        $jresp['chaptaRequired'] = KeeLink::needChapta($conn);
+        $jresp['chaptaRequired'] = FALSE;//KeeLink::needChapta($conn);
 
         if($jresp['chaptaRequired'] === TRUE) {
             $jresp['message'] = "Error(4): Chapta required";
