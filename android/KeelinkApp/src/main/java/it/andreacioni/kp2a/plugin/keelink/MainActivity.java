@@ -346,15 +346,22 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray array = new JSONArray(currentHistory);
                     JSONObject o = new JSONObject(json).put(KeelinkDefs.GUID_FIELD,id);
 
-                    if(!guidExist(array, (String) o.get(KeelinkDefs.GUID_FIELD))) {
-                        if(array.length() > KeelinkDefs.MAX_RECENT_HISTORY_LENGHT)
-                            array.put(0,o);
-                        else
-                            array.put(o);
-                        SharedPreferences.Editor editor = pref.edit();
-                        editor.putString(KeelinkDefs.RECENT_PREFERENCES_ENTRY, array.toString());
-                        editor.commit();
+                    int ret = guidExist(array, (String) o.get(KeelinkDefs.GUID_FIELD));
+
+                    if(ret == -1) {
+                        Log.d(TAG,"Entry not exist, creating it");
+
+                        array = insertEntry(array,o);
+                    } else {
+                        Log.d(TAG,"Put entry on top");
+
+
+                        array = putEntryOnTop(array,o,ret);
                     }
+
+                    SharedPreferences.Editor editor = pref.edit();
+                    editor.putString(KeelinkDefs.RECENT_PREFERENCES_ENTRY, array.toString());
+                    editor.commit();
 
                 } catch (JSONException e) {
                     Log.e(TAG,"Parsing exception on saving recents: " + e.getMessage());
@@ -363,16 +370,42 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(TAG,"Not a valid JSON object to save");
         }
 
-        private boolean guidExist(JSONArray array, String aLong) throws JSONException {
+        private JSONArray putEntryOnTop(JSONArray array,JSONObject o,int oIndex) throws JSONException {
+            JSONArray ret = new JSONArray();
+
+            ret.put(o);
+            for(int i=0;i<oIndex;i++) {
+                ret.put(array.get(i));
+            }
+            for(int i=oIndex+1;i<array.length();i++) {
+                ret.put(array.get(i));
+            }
+
+
+            return ret;
+        }
+
+        private JSONArray insertEntry(JSONArray array,JSONObject o) throws JSONException {
+            JSONArray ret = new JSONArray();
+
+            ret.put(o);
+            for(int i=0;i<array.length()-((array.length() > KeelinkDefs.MAX_RECENT_HISTORY_LENGHT)?1:0);i++) {
+                ret.put(array.get(i));
+            }
+
+            return ret;
+        }
+
+        private int guidExist(JSONArray array, String aLong) throws JSONException {
             for(int i=0;i<array.length();i++) {
                 JSONObject obj = array.getJSONObject(i);
 
                 if(obj.get(KeelinkDefs.GUID_FIELD).equals(aLong)) {
-                    return true;
+                    return i;
                 }
             }
 
-            return false;
+            return -1;
         }
     }
 
