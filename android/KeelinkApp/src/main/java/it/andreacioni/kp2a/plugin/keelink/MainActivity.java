@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -45,26 +46,24 @@ public class MainActivity extends AppCompatActivity {
     private String passwordReceived = null;
     private KeeLink keeLink = new KeeLink(this);
 
-    private Map<String,String> selected = null;
+    private Map<String, String> selected = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG,"onCreate");
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         setupProgressDialog();
-
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        boolean status = snackStatusShow();
-
-        new RecentActivityLoader(progressDialog,(ListView) findViewById(R.id.recent_list)).execute();
+        new RecentActivityLoader(progressDialog, (ListView) findViewById(R.id.recent_list)).execute();
         prepareListView();
 
-        if(status) { //last condition ensure that the capture activity starts correctly TODO check this solution...
-            if(savedInstanceState == null) {
+        if (snackStatusShow()) {
+            if (savedInstanceState == null) {//condition ensure that the capture activity starts correctly TODO check this solution...
                 Intent i = getIntent();
                 if ((i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
                         i.getStringExtra(Strings.EXTRA_ENTRY_ID) != null) {
@@ -78,15 +77,14 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, "Password parsing error" + e.getMessage());
                     }
 
-                    new AsyncSavePreferencesTask(progressDialog,i.getStringExtra(Strings.EXTRA_ENTRY_ID),i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).execute();
+                    new AsyncSavePreferencesTask(progressDialog, i.getStringExtra(Strings.EXTRA_ENTRY_ID), i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).execute();
                     startScanActivity();
                 }
-
             } else {
                 passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
+                KeelinkDefs.setFastFlag(this,false);
             }
         }
-
     }
 
     private void prepareListView() {
@@ -94,15 +92,17 @@ public class MainActivity extends AppCompatActivity {
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d(TAG,adapterView.getItemAtPosition(i).toString());
-                if(selected != null && selected.equals((Map<String, String>) adapterView.getItemAtPosition(i))) {
+                Log.d(TAG, adapterView.getItemAtPosition(i).toString());
+                if (selected != null && selected.equals((Map<String, String>) adapterView.getItemAtPosition(i))) {
                     new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
                             .setTitleText("Just another click")
                             .setContentText("Click on green button below to open the Keepass entry")
                             .setConfirmText("Ok!")
                             .show();
-                } else
+                } else {
                     selected = (Map<String, String>) adapterView.getItemAtPosition(i);
+                    KeelinkDefs.setFastFlag(getApplicationContext(),true);
+                }
             }
         });
     }
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        if(passwordReceived != null) {
+        if (passwordReceived != null) {
             outState.putString(Strings.EXTRA_ENTRY_OUTPUT_DATA, passwordReceived);
             //outState.putString(Strings.EXTRA_FIELD_ID, launcherIntent.getStringExtra(Strings.EXTRA_FIELD_ID));
             //outState.putString(Strings.EXTRA_SENDER, launcherIntent.getStringExtra(Strings.EXTRA_SENDER));
@@ -133,6 +133,11 @@ public class MainActivity extends AppCompatActivity {
         snackStatusShow();
 
         ((ListView) findViewById(R.id.recent_list)).setSelection(ListView.INVALID_POSITION);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -166,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(Strings.ACTION_EDIT_PLUGIN_SETTINGS);
             i.putExtra(Strings.EXTRA_PLUGIN_PACKAGE, getPackageName());
             startActivityForResult(i, ACTIVITY_ENABLE_DISABLE);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -177,10 +182,10 @@ public class MainActivity extends AppCompatActivity {
         boolean ret = false;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        if(isEnabled()) {
+        if (isEnabled()) {
             Snackbar.make(fab, "Not enabled as plugin", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
         } else {
-            if(!KeeLink.checkNetworkConnection(this))
+            if (!KeeLink.checkNetworkConnection(this))
                 Snackbar.make(fab, "No network connection", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
             else {
                 Snackbar.make(fab, "Ready!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
@@ -198,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 //Intent i = Kp2aControl.getOpenEntryIntent("",false,true);
                 //startActivityForResult(i,399)
 
-                if(selected == null) {
+                if (selected == null) {
                     new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
                             .setTitleText("Hmmm not understanding...")
                             .setContentText("No selection made, would you open Keepass2Android?")
@@ -208,15 +213,16 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
                                     sDialog.dismissWithAnimation();
+                                    KeelinkDefs.setFastFlag(getApplicationContext(),true);
                                     openKeepass();
                                 }
                             })
                             .show();
-                } else if("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())){
-                    Log.d(TAG,"Opening K2PA...");
+                } else if ("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())) {
+                    Log.d(TAG, "Opening K2PA...");
                     openKeepass();
                 } else {
-                    Log.d(TAG,"Sending entry...");
+                    Log.d(TAG, "Sending entry...");
                     String title = selected.get(KeepassDefs.TitleField);
                     String user = selected.get(KeepassDefs.UserNameField);
 
@@ -237,11 +243,11 @@ public class MainActivity extends AppCompatActivity {
         /*String note = selected.get(KeepassDefs.NotesField);
         String url = selected.get(KeepassDefs.url)*/
 
-        if(title != null && !title.trim().isEmpty())
+        if (title != null && !title.trim().isEmpty())
             ret += title.trim() + " ";
 
-        if(user != null && !user.substring(KeepassDefs.UserNameField.length()+1).trim().isEmpty())
-            ret += user.substring(KeepassDefs.UserNameField.length()+1).trim() + " ";
+        if (user != null && !user.substring(KeepassDefs.UserNameField.length() + 1).trim().isEmpty())
+            ret += user.substring(KeepassDefs.UserNameField.length() + 1).trim() + " ";
 
         /*if(note != null && note.substring(KeepassDefs.NotesField.length()+1).trim().isEmpty())
             ret += note.substring(KeepassDefs.NotesField.length()+1).trim() + " ";*/
@@ -254,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openKeepassForSearch(String searchText) {
-        Intent i = Kp2aControl.getOpenEntryIntent(searchText,false,false);
+        Intent i = Kp2aControl.getOpenEntryIntent(searchText, false, true);
         startActivityForResult(i, START_KEEPASS_CODE);
     }
 
@@ -273,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG,"onActivityResult reqCode=" + requestCode + " resultCode=" + resultCode + " data=" + data);
+        Log.d(TAG, "onActivityResult reqCode=" + requestCode + " resultCode=" + resultCode + " data=" + data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null && passwordReceived != null) {
             String content = result.getContents();
@@ -281,12 +287,12 @@ public class MainActivity extends AppCompatActivity {
             if (content != null) {
 
                 Log.d(TAG, "Scanned");
-                Log.d(TAG,"Pass:" + passwordReceived);
+                Log.d(TAG, "Pass:" + passwordReceived);
 
                 if (content.startsWith(KeeLink.QR_CODE_PREFIX)) {
                     content = content.substring(KeeLink.QR_CODE_PREFIX.length());
                     Log.d(TAG, "Valid code scanned:" + content);
-                    validSidReceived(content,passwordReceived);
+                    validSidReceived(content, passwordReceived);
                 } else {
                     Log.e(TAG, "Invalid code:" + content);
                     Toast.makeText(this, "Invalid QR code scanned!", Toast.LENGTH_SHORT).show();
@@ -302,21 +308,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void validSidReceived(String sid,String password) {
+    private void validSidReceived(String sid, String password) {
 
-        if(snackStatusShow()) {
+        if (snackStatusShow()) {
             keeLink.sendKey(sid, password, new AsyncPostResponse() {
                 @Override
                 public void response(boolean result) {
-                    if(result)
-                        Toast.makeText(getApplicationContext(),"Password correctly sent", Toast.LENGTH_SHORT).show();
+                    if (result)
+                        Toast.makeText(getApplicationContext(), "Password correctly sent", Toast.LENGTH_SHORT).show();
                     else
-                        Toast.makeText(getApplicationContext(),"Password NOT correctly sent. Try again...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Password NOT correctly sent. Try again...", Toast.LENGTH_SHORT).show();
 
                 }
             });
         } else
-            Toast.makeText(this,"No network connection available!",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No network connection available!", Toast.LENGTH_SHORT).show();
 
     }
 

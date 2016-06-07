@@ -25,6 +25,8 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
 
     private static final String TAG = Kp2aActionReceiver.class.getSimpleName();
 
+    private boolean flagFlashSending = false;
+
     @Override
     protected void openEntry(OpenEntryAction oe) {
         Log.d(TAG,"Open entry:" + oe.toString());
@@ -38,23 +40,37 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
         } catch (PluginAccessException e) {
             Log.e(TAG,e.getMessage());
         }
+
+        if(flagFlashSending) {
+            Intent i = new Intent(oe.getContext(), MainActivity.class);
+
+            i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(oe.getEntryFields()).toString());
+            i.putExtra(Strings.EXTRA_ENTRY_ID, oe.getEntryId());
+            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            oe.getContext().startActivity(i);
+        }
+
     }
 
     @Override
+    protected void actionSelected(ActionSelectedAction actionSelected) {
+        Intent i = new Intent(actionSelected.getContext(), MainActivity.class);
+
+        i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(actionSelected.getEntryFields()).toString());
+        i.putExtra(Strings.EXTRA_ENTRY_ID,actionSelected.getEntryId());
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+        actionSelected.getContext().startActivity(i);
+
+        super.actionSelected(actionSelected);
+    }
+
+
+
+    @Override
     public void onReceive(Context ctx, Intent intent) {
-
-        try {
-            Intent i = new Intent(ctx, MainActivity.class);
-
-            i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(intent.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).toString());
-            i.putExtra(Strings.EXTRA_ENTRY_ID,intent.getStringExtra(Strings.EXTRA_ENTRY_ID));
-            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-            ctx.startActivity(i);
-        } catch (JSONException e) {
-            Log.e(TAG, "Error parsing passed extra: " + e.getMessage());
-        }
-
+        flagFlashSending = KeelinkDefs.getFastFlag(ctx);
         super.onReceive(ctx,intent);
     }
 }
