@@ -13,7 +13,7 @@ class KeeLink {
         
         $conn = KeeLink::getConnection();
         
-        $jresp['chaptaRequired'] = FALSE;//KeeLink::needChapta($conn);
+        $jresp['chaptaRequired'] = FALSE;//TODO KeeLink::needChapta($conn);
 
         if($jresp['chaptaRequired'] === TRUE) {
             $jresp['message'] = "Error(4): Chapta required";
@@ -133,15 +133,19 @@ class KeeLink {
         // Create connection
         $CONFIG_INI = parse_ini_file('private/config.ini');
         
-        if($CONFIG_INI == FALSE)
-        echo "erroo";
-        
-		$conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname']);
-		// Check connection
-		if ($conn->connect_error)
-			die("Connection failed: " . $conn->connect_error);
-		else {
-            return $conn;
+        if($CONFIG_INI == FALSE) {
+            $CONFIG_INI['host'] = "OPENSHIFT_keelink_DB_HOST";
+            $CONFIG_INI['username'] = "OPENSHIFT_keeink_DB_USERNAME";
+            $CONFIG_INI['password'] = "OPENSHIFT_keelink_DB_PASSWORD";
+            $CONFIG_INI['dbname'] = "keelink";
+        } else {
+            $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname']);
+            // Check connection
+            if ($conn->connect_error)
+                die("Connection failed: " . $conn->connect_error);
+            else {
+                return $conn;
+            }
         }
     }
 
