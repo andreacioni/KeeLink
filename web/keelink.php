@@ -139,10 +139,10 @@ class KeeLink {
             $CONFIG_INI['password'] = getenv('OPENSHIFT_MYSQL_DB_PASSWORD');
             $CONFIG_INI['dbname'] = "keelink";
             $CONFIG_INI['port'] = getenv('OPENSHIFT_MYSQL_DB_PORT');
-        } else {
-            $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: " . mysqli_error($conn));
-            return $conn;
         }
+        
+        $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: " . mysqli_error($conn));
+        return $conn;
     }
 
 }
