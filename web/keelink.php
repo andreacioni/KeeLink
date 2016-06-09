@@ -134,11 +134,11 @@ class KeeLink {
         $CONFIG_INI = parse_ini_file('private/config.ini');
         
         if($CONFIG_INI == FALSE) {
-            $CONFIG_INI['host'] = $_ENV["OPENSHIFT_MYSQL_DB_HOST"];
-            $CONFIG_INI['username'] = $_ENV["OPENSHIFT_MYSQL_DB_USERNAME"];
-            $CONFIG_INI['password'] = $_ENV["OPENSHIFT_MYSQL_DB_PASSWORD"];
+            $CONFIG_INI['host'] = $_SERVER["OPENSHIFT_MYSQL_DB_HOST"];
+            $CONFIG_INI['username'] = $_SERVER["OPENSHIFT_MYSQL_DB_USERNAME"];
+            $CONFIG_INI['password'] = $_SERVER["OPENSHIFT_MYSQL_DB_PASSWORD"];
             $CONFIG_INI['dbname'] = "keelink";
-            $CONFIG_INI['port'] = $_ENV["OPENSHIFT_MYSQL_DB_PORT"];
+            $CONFIG_INI['port'] = $_SERVER["OPENSHIFT_MYSQL_DB_PORT"];
         } else {
             $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: " . mysqli_error($conn));;
             return $conn;
