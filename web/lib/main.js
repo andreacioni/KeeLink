@@ -3,6 +3,7 @@ const REQUEST_INTERVAL = 2000;
 
 var _sid;
 var invalidateSid = false;
+var requestFinished = true;
 var pollingInterval;
 
 function init() {
@@ -41,8 +42,9 @@ function initAsyncAjaxRequest() {
 }
 
 function passwordLooker() {
-	if(!invalidateSid) {
-		$.post("getpassforsid.php",{'sid':_sid},onSuccess,"json");
+	if(!invalidateSid && requestFinished) {
+		requestFinished = false;
+		$.post("getpassforsid.php",{'sid':_sid},onSuccess,"json").always(function() {requestFinished = true;});
 	} else {
 		invalidateSession(); 
 		alertWarn("No password received...","No password was received in the last minute, reload page to start a new session");
@@ -51,8 +53,21 @@ function passwordLooker() {
 
 function initClipboardButton(password) {
 	$("#copyBtn").show();
+	$("#moreBtn").show().click(
+		function(){
+			if($("#hiddenMoreButtonField").is(":hidden"))
+				$("#hiddenMoreButtonField").slideDown();
+			else
+				$("#hiddenMoreButtonField").slideUp();
+		}
+	);
+	$("#clearBtn").show();
+	
 	$("#copyBtn").attr("data-clipboard-text",password);
+	
 	new Clipboard('#copyBtn');
+	new Clipboard('#moreBtn');
+	new Clipboard('#clearBtn');
 }
 
 function initQrCode() {
@@ -109,7 +124,7 @@ function checkBrowserSupport(params) {
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
 		initClipboardButton(data.message);
-		alertSuccess("Password received!","Your password was saved in clipboard, paste it where you want!");
+		alertSuccess("Password received!","Would you copy password on clipboard?");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
 	}

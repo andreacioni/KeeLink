@@ -1,14 +1,19 @@
+
 #qrcode {
-    transition-property: opacity;
-    transition-duration: 1.15s;
-    transition-timing-function: ease;
-    transition-delay: 0s;
+  transition-property: opacity;
+  transition-duration: 1.15s;
+  transition-timing-function: ease;
+  transition-delay: 0s;
   transition-property: opacity;
   transition-duration: 1.15s;
   transition-timing-function: ease;
   transition-delay: 0s;
   opacity: 0;
   z-index: 1; 
+  height: 200px;
+  width: 200px;
+  margin: auto;
+  /*background-image: url("../images/invalidqr.png");*/
 }
 
 

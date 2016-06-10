@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="css/custom.css">
   <link rel="stylesheet" href="css/sweetalert.css">
   <link rel="stylesheet" href="css/pace.css">
+  <link rel="stylesheet" href="css/font-awesome.min.css">
 
   <!-- Favicon
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -36,6 +37,7 @@
   <script type="text/javascript" src="lib/clipboard/clipboard.min.js"></script>
   <script type="text/javascript" src='https://www.google.com/recaptcha/api.js'></script>
 
+
   <script type="text/javascript" src="lib/main.js"></script>
   
  </head>
@@ -47,9 +49,10 @@
 			<div class="container">
 				<ul class="navbar-list">
 					<li class="navbar-item"><a class="navbar-link" href="#"> <img src="images/favicon.ico"/> KeeLink</a></li>
-					<li class="navbar-item"><a class="navbar-link anchorLink" href="#howto"> How To</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#howto"> How To</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#howworks"> How it works </a></li>
 					<li class="navbar-item"><a class="navbar-link" href="#credits">Credits</a></li>
-					<li class="navbar-item"><a class="navbar-link" href="#donate">Donate</a></li>
+					<li class="navbar-item"><a class="navbar-link" href="#contribute">Contribute</a></li>
 				</ul>
 			</div>
 		</nav>
@@ -65,24 +68,64 @@
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
-				<div class="row"><div class="twelve columns"><div height="200" width="200" align="center" id="qrcode"></div></div></div>
+				<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
 				<div class="row">
 					<div class="twelve columns">
-						<p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <span id="sidLabel"></span></b></p>
-						<p class="content-font" align="center"><button id="copyBtn" data-clipboard-text="no password" hidden>Copy to clipboard</button></p>
+						<p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <br> <span id="sidLabel">Receiving...</span></b></p>
+						<p class="content-font" align="center">
+							<button id="copyBtn" data-clipboard-text="no password" hidden>Copy to clipboard</button>
+							<button id="moreBtn" hidden><i class="fa fa-angle-down" aria-hidden="true"></i></button>
+							
+						</p>
 					</div>
 				</div>
+				<div class="row">
+					<div class="twelve columns" id="hiddenMoreButtonField" hidden>
+						<button id="clearBtn" data-clipboard-text="" hidden>Clear clipboard</button>
+					</div>
+				</div>
+
 			
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
 			</div>
 
-			
+			<!-- How to -->
 			<div id="howto" class="container docs-section">
 				<h2>How To</h2>
+				<p>
+					In order to send password to this page you first need to follow <b>3 simple step</b>:
+					<ol>
+						<!-- First step -->
+						<li>
+							<b>Download and install</b> needed app on your phone/table
+							<ul>
+								<li>Keepass2Android Password Manager (<a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android">online</a> or <a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android_nonet&hl=it">offline</a> version)</li>
+								<li>KeeLink Plug-In for Keepass2Android(<a href="#">here</a>)</li>
+							</ul>
+						</li>
+
+						<li>
+							Open Keepass2Android and click on the <b>password entry context</b> menu as shown
+						</li>
+
+						<li>
+							On the opened window you can <b>frame the QR code on this page</b> and wait for password to be sent.
+						</li>
+
+						<li>
+							Interested on details? Just go ahead!
+						</li>
+					</ol>
+					
+				</p>
+			</div>
+
+			<div id="howworks" class="container docs-section">
+				<h2>How it works</h2>
 				<p>
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
 					
@@ -97,20 +140,18 @@
 				</p>
 			</div>
 			
-			<div id="donate" class="container docs-section">
-				<h2>Donate</h2>
+			<div id="contribute" class="container docs-section">
+				<h2>Contribute</h2>
 				<p>
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
 					
 				</p>
 			</div>
 			
-			<div class="container docs-section"></div>
-			
-			<!-- Footer -->
 			<div class="container docs-section">
-				<div class="row" style="height: 200px;">
-					<div class="twelve columns"><p style="font-size: 58px;font-weight: bold;color: red;"align="center"></p></div>
+				<div class="row">
+						<div class="six columns"><p>Brought to you by <b>Andrea Cioni</b></p></div>
+						<div class="six columns"><p>Hosted for free on <a href="https://www.openshift.com/"><img height="16px" src="images/openshift_logo.png" /></a></p></div>
 				</div>
 			</div>
 		</div>
