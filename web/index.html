@@ -101,7 +101,7 @@
 					<ol>
 						<!-- First step -->
 						<li>
-							<b>Download and install</b> needed app on your phone/table
+							<b>Download and install</b> needed app on your phone/tablet
 							<ul>
 								<li>Keepass2Android Password Manager (<a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android">online</a> or <a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android_nonet&hl=it">offline</a> version)</li>
 								<li>KeeLink Plug-In for Keepass2Android(<a href="#">here</a>)</li>
@@ -126,17 +126,46 @@
 
 			<div id="howworks" class="container docs-section">
 				<h2>How it works</h2>
-				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
-					
-				</p>
+				<h3>KeeLink has a very simple and strong architecture, it is composed mainly of two parts:</h3>
+				<ul>
+					The Android one<li>
+						<p> 
+							KeeLink Android application acts as a bridge from Keepass2Android and this web page. Every password are retrieved
+							from the Keepass Database. Once the password was received the application wait for the user to scan the QR code 
+							with its device camera. QR Code contains a simple URL as <i>ksid://yourpersonalanduniquesid</i>, so when the QR code 
+							is correctly parsed the password was sent to a database and associated to <i>'yourpersonalanduniquesid'</i>. <b>No other information are sent 
+							over network</b>, <b>that is important for you</b> because it is essential for our to mantain your password as safe as possible. 
+							More security for your password was added by the <b>HTTPS/SSL</b> protocol that is used for real transmit from Android to World Wide Web.
+
+						</p>
+					</li>
+					The PHP one<li>
+						<p> 
+							KeeLink PHP application acts only as a simple
+						</p>
+					</li>
+				<ul>
 			</div>
 			
 			<div id="credits" class="container docs-section">
 				<h2>Credits</h2>
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
-					
+					KeeLink was designed,developed and supported by Andrea Cioni. All source file used to build this service are hosted, and accessible to everyone
+					on <a href="https://github.com/andreacioni/KeeLink">GitHub</a>.
+				</p>
+				<p>
+					This project is totally open source, built with the support of a lot of wonderful works. Here the list:
+					<br>
+					Android:<ul>
+						<li>Keepass2Android - </li>
+						<li>ZXing Embedded - </li>
+						<li>Sweet Alert for Android- </li>
+					</ul>
+					Web:<ul>
+						<li>Skelethon - </li>
+						<li>Font Awasome - </li>
+						<li>JQuery - </li>
+					</ul>
 				</p>
 			</div>
 			
@@ -152,6 +181,7 @@
 				<div class="row">
 						<div class="six columns"><p>Brought to you by <b>Andrea Cioni</b></p></div>
 						<div class="six columns"><p>Hosted for free on <a href="https://www.openshift.com/"><img height="16px" src="images/openshift_logo.png" /></a></p></div>
+						<div align="center" class="ten columns"><p><a href="https://github.com/andreacioni/KeeLink"><img height="50px" src="images/github_logo.png" /></a></p></div>
 				</div>
 			</div>
 		</div>
