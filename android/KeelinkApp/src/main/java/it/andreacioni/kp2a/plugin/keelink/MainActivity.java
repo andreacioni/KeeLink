@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -182,16 +183,22 @@ public class MainActivity extends AppCompatActivity {
         boolean ret = false;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        if (isEnabled()) {
-            Snackbar.make(fab, "Not enabled as plugin", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
-        } else {
-            if (!KeeLink.checkNetworkConnection(this))
-                Snackbar.make(fab, "No network connection", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
-            else {
-                Snackbar.make(fab, "Ready!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-                ret = true;
+        if(isKeepassInstalled()) {
+            if (!isEnabled()) {
+                Snackbar.make(fab, "Not enabled as plugin", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
+            } else {
+                if (!KeeLink.checkNetworkConnection(this))
+                    Snackbar.make(fab, "No network connection", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
+                else {
+                    Snackbar.make(fab, "Ready!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+                    ret = true;
+                }
             }
+        } else {
+            Snackbar.make(fab, "Keepass2Android not found", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
+            fab.hide();
         }
+
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -265,7 +272,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean isEnabled() {
-        return AccessManager.getAllHostPackages(this).isEmpty();
+        return !AccessManager.getAllHostPackages(this).isEmpty();
+    }
+
+    private boolean isKeepassInstalled() {
+        PackageManager pm = getPackageManager();
+        boolean app_installed;
+
+        //Check online
+        try {
+            pm.getPackageInfo("keepass2android.keepass2android", PackageManager.GET_ACTIVITIES);
+            app_installed = true;
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            app_installed = false;
+        }
+
+        //Check offline
+        try {
+            pm.getPackageInfo("keepass2android.keepass2android_nonet", PackageManager.GET_ACTIVITIES);
+            app_installed = true;
+        }
+        catch (PackageManager.NameNotFoundException e) {
+            app_installed = false;
+        }
+
+        return app_installed;
     }
 
 

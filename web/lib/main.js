@@ -55,13 +55,12 @@ function initClipboardButton(password) {
 	$("#copyBtn").show();
 	$("#moreBtn").show().click(
 		function(){
-			if($("#hiddenMoreButtonField").is(":hidden"))
-				$("#hiddenMoreButtonField").slideDown();
+			if($("#clearBtn").is(":hidden"))
+				$("#clearBtn").slideDown();
 			else
-				$("#hiddenMoreButtonField").slideUp();
+				$("#clearBtn").slideUp();
 		}
 	);
-	$("#clearBtn").show();
 	
 	$("#copyBtn").attr("data-clipboard-text",password);
 	
