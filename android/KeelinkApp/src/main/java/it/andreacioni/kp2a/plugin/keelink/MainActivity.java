@@ -1,11 +1,9 @@
 package it.andreacioni.kp2a.plugin.keelink;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,11 +21,9 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
@@ -78,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, "Password parsing error" + e.getMessage());
                     }
 
-                    new AsyncSavePreferencesTask(progressDialog, i.getStringExtra(Strings.EXTRA_ENTRY_ID), i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).execute();
+                    new AsyncPostTask.AsyncSavePreferencesTask(progressDialog, i.getStringExtra(Strings.EXTRA_ENTRY_ID), i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).execute();
                     startScanActivity();
                 }
             } else {
@@ -157,13 +153,23 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         switch (id) {
-            case R.id.action_settings:
-                return true; //TODO
+            case R.id.howto:
+                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/#howto?onlyinfo=true");
+                break;
+            case R.id.about:
+                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/#credits?onlyinfo=true");
+                break;
             case R.id.enable_plugin:
-                return enableDisablePlugin();
+                enableDisablePlugin();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void openBrowserWithUrl(String url) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        startActivity(browserIntent);
     }
 
     private boolean enableDisablePlugin() {

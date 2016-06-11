@@ -9,8 +9,6 @@ import android.net.NetworkInfo;
  */
 public class KeeLink {
 
-    private static final String TARGET_SITE = "http://andysite.altervista.org/keepass";
-
     public static final String QR_CODE_PREFIX = "ksid://";
 
     private Context ctx = null;
@@ -21,7 +19,7 @@ public class KeeLink {
 
     public void sendKey(String sid, String key,AsyncPostResponse response) {
         AsyncPostTask post = new AsyncPostTask(response);
-        post.execute(TARGET_SITE, sid, key);
+        post.execute(KeelinkDefs.TARGET_SITE, sid, key);
     }
 
     public boolean checkNetworkConnection() {
