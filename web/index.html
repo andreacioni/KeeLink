@@ -97,7 +97,7 @@
 			<div id="howto" class="container docs-section">
 				<h2>How To</h2>
 				<p>
-					In order to send password to this page you first need to follow <b>3 simple step</b>:
+					In order to send password to this page you first need to follow <b>3 simple steps</b>:
 					<ol>
 						<!-- First step -->
 						<li>
@@ -109,11 +109,11 @@
 						</li>
 
 						<li>
-							Open Keepass2Android and click on the <b>password entry context</b> menu as shown
+							Open Keepass2Android and click on <b>KeeLink button 'Send'</b> in the password entry context menu
 						</li>
 
 						<li>
-							On the opened window you can <b>frame the QR code on this page</b> and wait for password to be sent.
+							On the opened window you can <b>scan the QR code on this page</b> and wait for password to be sent.
 						</li>
 
 						<li>
@@ -126,45 +126,55 @@
 
 			<div id="howworks" class="container docs-section">
 				<h2>How it works</h2>
-				<h3>KeeLink has a very simple and strong architecture, it is composed mainly of two parts:</h3>
+				<p><i>KeeLink has a very <b>simple and strong architecture</b>, it is composed mainly of two parts:</i></p>
 				<ul>
-					The Android one<li>
-						<p> 
-							KeeLink Android application acts as a bridge from Keepass2Android and this web page. Every password are retrieved
-							from the Keepass Database. Once the password was received the application wait for the user to scan the QR code 
-							with its device camera. QR Code contains a simple URL as <i>ksid://yourpersonalanduniquesid</i>, so when the QR code 
-							is correctly parsed the password was sent to a database and associated to <i>'yourpersonalanduniquesid'</i>. <b>No other information are sent 
-							over network</b>, <b>that is important for you</b> because it is essential for our to mantain your password as safe as possible. 
+					<li>The Android one</li>
+					<ul>
+						<li>
+							KeeLink Android application acts as a bridge from Keepass2Android to this web page. Every password is retrieved
+							from the Keepass Database. Once the password is received, the application waits for the user to scan QR code 
+							with its device camera. QR Code contains a simple URL as <i>ksid://yourpersonalanduniquesessionid</i>, so when the QR code 
+							is correctly parsed, the password is sent to a database and associated with <i>'yourpersonalanduniquesessionid'</i>. <b>No other information are sent 
+							over network</b>, <b>that is important for you</b> because it is essential for me to mantain your password as safe as possible. 
 							More security for your password was added by the <b>HTTPS/SSL</b> protocol that is used for real transmit from Android to World Wide Web.
-
-						</p>
-					</li>
-					The PHP one<li>
-						<p> 
-							KeeLink PHP application acts only as a simple
-						</p>
-					</li>
+						</li>
+					</ul>
+					<li>The PHP one</li>
+					<ul>
+						<li>
+							KeeLink PHP application acts only as a simple server that build a custom session ID, random generated, only for you. It is converted to 
+							QR Code and dispayed at the top of the page. Once QR is received your page starts querying database and listening for an upcoming password.
+						</li>
+					</ul>
 				<ul>
+				<p>That's all! But if you don't trust me let's see the <a href="https://github.com/andreacioni/KeeLink">source code</a></p>
 			</div>
 			
 			<div id="credits" class="container docs-section">
 				<h2>Credits</h2>
 				<p>
-					KeeLink was designed,developed and supported by Andrea Cioni. All source file used to build this service are hosted, and accessible to everyone
+					KeeLink is designed, developed and supported by Andrea Cioni. All source files used to build this service are hosted, and accessible to everyone
 					on <a href="https://github.com/andreacioni/KeeLink">GitHub</a>.
 				</p>
 				<p>
 					This project is totally open source, built with the support of a lot of wonderful works. Here the list:
 					<br>
-					Android:<ul>
-						<li>Keepass2Android - </li>
-						<li>ZXing Embedded - </li>
-						<li>Sweet Alert for Android- </li>
+					<ul>
+						<li><b>Android</b>:</li>
+						<ul>
+							<li>Keepass2Android - </li>
+							<li>ZXing Embedded - </li>
+							<li>Sweet Alert for Android- </li>
+						</ul>
 					</ul>
-					Web:<ul>
-						<li>Skelethon - </li>
-						<li>Font Awasome - </li>
-						<li>JQuery - </li>
+					<ul>
+						<li><b>Web</b>:</li>
+						<ul>
+							<li>Skelethon - </li>
+							<li>Font Awasome - </li>
+							<li>JQuery - </li>
+							<li>QR JS library - <li>
+						</ul>
 					</ul>
 				</p>
 			</div>
@@ -172,8 +182,17 @@
 			<div id="contribute" class="container docs-section">
 				<h2>Contribute</h2>
 				<p>
-					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc eleifend dui nec magna malesuada posuere. Donec egestas sit amet arcu feugiat sodales. Cras tempus nisi non auctor pellentesque. Integer pellentesque sem quis ornare varius. Ut euismod odio ut diam rhoncus lacinia. In ac mauris ac ipsum pellentesque cursus. Nunc quis sapien in diam dignissim elementum eu id dui. Duis at congue tortor. Maecenas maximus erat et enim imperdiet imperdiet. Praesent vulputate mi eu sodales gravida. Sed risus ligula, porttitor et molestie vel, ultrices vel dui. Sed mollis turpis eu urna malesuada suscipit. Pellentesque congue nulla et dui cursus, quis auctor lectus viverra. Donec sit amet bibendum elit, vel luctus tortor. Proin finibus nec ligula pretium ultrices.
-					
+					KeeLink is a <a>free and no-profit application</a>. If you like and use this application consider to support 
+					me by sharing it with other people. Remember that is also possible to <b>donate something</b> in order to support 
+					the development and maintenance of all its parts.
+					<div align="center">
+						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+							<input type="hidden" name="cmd" value="_s-xclick">
+							<input type="hidden" name="hosted_button_id" value="P4B9MDV9WYDS2">
+							<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
+							<img alt="" border="0" src="https://www.paypalobjects.com/it_IT/i/scr/pixel.gif" width="1" height="1">
+						</form>
+					</div>
 				</p>
 			</div>
 			

@@ -27,9 +27,7 @@ function init() {
 	
 	//Enable scrolling effect on anchor clicking
 	var _root = $('html, body');
-	$('a').click(function(event){
-		if($(this).attr('href').startsWith("#") === false)
-			return false;
+	$('a.navbar-link').click(function(event){
 		event.preventDefault();
 		_root.animate({
 			scrollTop: $( $(this).attr('href') ).offset().top
