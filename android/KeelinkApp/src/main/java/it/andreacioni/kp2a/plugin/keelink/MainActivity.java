@@ -290,17 +290,15 @@ public class MainActivity extends AppCompatActivity {
             pm.getPackageInfo("keepass2android.keepass2android", PackageManager.GET_ACTIVITIES);
             app_installed = true;
         }
-        catch (PackageManager.NameNotFoundException e) {
-            app_installed = false;
-        }
-
-        //Check offline
-        try {
-            pm.getPackageInfo("keepass2android.keepass2android_nonet", PackageManager.GET_ACTIVITIES);
-            app_installed = true;
-        }
-        catch (PackageManager.NameNotFoundException e) {
-            app_installed = false;
+        catch (PackageManager.NameNotFoundException e1) {
+            //Check offline
+            try {
+                pm.getPackageInfo("keepass2android.keepass2android_nonet", PackageManager.GET_ACTIVITIES);
+                app_installed = true;
+            }
+            catch (PackageManager.NameNotFoundException e2) {
+                app_installed = false;
+            }
         }
 
         return app_installed;

@@ -12,8 +12,6 @@
   z-index: 1; 
   height: 200px;
   width: 200px;
-  margin: auto;
-  /*background-image: url("../images/invalidqr.png");*/
 }
 
 
@@ -34,6 +32,7 @@
   font-size: 30px;
 }
 
+/*From Skelethon site*/
 
 .container {
   max-width: 800px; }

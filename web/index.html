@@ -1,11 +1,12 @@
+<!DOCTYPE html>
 <html>
  <head>
   <!-- Basic Page Needs
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   <meta charset="utf-8">
   <title>KeeLink</title>
-  <meta name="Keepass Test Page" content="">
-  <meta name="Andrea Cioni" content="">
+  <meta name="title" content="KeeLink">
+  <meta name="author" content="Andrea Cioni">
     
   <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -41,7 +42,7 @@
   <script type="text/javascript" src="lib/main.js"></script>
   
  </head>
- <body onload="init()" >
+ <body>
  	<div class="container">
 		 
 		 <!-- Navigationbar -->
@@ -69,7 +70,7 @@
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
-				<div class="row"><div class="twelve columns"><div align="center" id="qrcode"></div></div></div>
+				<div class="row"><div class="twelve columns" align="center"><div id="qrcode"></div></div></div>
 				
 				<div class="row"><div class="twelve columns">&nbsp;</div></div>
 				
@@ -94,30 +95,32 @@
 			<div id="howto" class="container docs-section">
 				<h2>How To</h2>
 				<p>
-					In order to send password to this page you first need to follow <b>3 simple steps</b>:
-					<ol>
-						<!-- First step -->
-						<li>
-							<b>Download and install</b> needed app on your phone/tablet
-							<ul>
-								<li>Keepass2Android Password Manager (<a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android">online</a> or <a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android_nonet&hl=it">offline</a> version)</li>
-								<li>KeeLink Plug-In for Keepass2Android(<a href="#">here</a>)</li>
-							</ul>
-						</li>
-
-						<li>
-							Open Keepass2Android and click on <b>KeeLink button 'Send'</b> in the password entry context menu
-						</li>
-
-						<li>
-							On the opened window you can <b>scan the QR code on this page</b> and wait for password to be sent.
-						</li>
-
-						<li>
-							Interested on details? Just go ahead!
-						</li>
-					</ol>
+					In order to send password to this page you first need to follow <b>4 simple steps</b>:
+				</p>
+				<ol>
+					<!-- First step -->
+					<li>
+						<b>Download and install</b> needed app on your phone/tablet
+						<ul>
+							<li>Keepass2Android Password Manager (<a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android">online</a> or <a href="https://play.google.com/store/apps/details?id=keepass2android.keepass2android_nonet&hl=it">offline</a> version)</li>
+							<li>KeeLink Plug-In for Keepass2Android(<a href="#">here</a>)</li>
+						</ul>
+					</li>
 					
+					<li>
+						<b>Open this page</b> on the device you want to send the password.
+					</li>
+
+					<li>
+						Open Keepass2Android and click on <b>KeeLink button 'Send'</b> in the password entry context menu
+					</li>
+
+					<li>
+						On the opened window you can <b>scan the QR code on this page</b> and wait for password to be sent.
+					</li>
+				</ol>
+				<p>
+					Interested on details? Just go ahead!
 				</p>
 			</div>
 
@@ -125,8 +128,8 @@
 				<h2>How it works</h2>
 				<p><i>KeeLink has a very <b>simple and strong architecture</b>, it is composed mainly of two parts:</i></p>
 				<ul>
-					<li>The Android one</li>
-					<ul>
+					
+					<li>The Android one<ul>
 						<li>
 							KeeLink Android application acts as a bridge from Keepass2Android to this web page. Every password is retrieved
 							from the Keepass Database. Once the password is received, the application waits for the user to scan QR code 
@@ -135,69 +138,64 @@
 							over network</b>, <b>that is important for you</b> because it is essential for me to mantain your password as safe as possible. 
 							More security for your password was added by the <b>HTTPS/SSL</b> protocol that is used for real transmit from Android to World Wide Web.
 						</li>
-					</ul>
-					<li>The PHP one</li>
-					<ul>
+					</ul></li>
+					<li>The PHP one<ul>
 						<li>
 							KeeLink PHP application acts only as a simple server that build a custom session ID, random generated, only for you. It is converted to 
 							QR Code and dispayed at the top of the page. Once QR is received your page starts querying database and listening for an upcoming password.
 						</li>
-					</ul>
-				<ul>
+					</ul></li>
+				</ul>
 				<p>That's all! But if you don't trust me let's see the <a href="https://github.com/andreacioni/KeeLink">source code</a></p>
 			</div>
 			
 			<div id="credits" class="container docs-section">
 				<h2>Credits</h2>
 				<p>
-					KeeLink is designed, developed and supported by Andrea Cioni. All source files used to build this service are hosted, and accessible to everyone
+					KeeLink is designed, developed and supported by <b>Andrea Cioni</b>. All source files used to build this service are hosted, and accessible to everyone
 					on <a href="https://github.com/andreacioni/KeeLink">GitHub</a>.
 				</p>
-				<p>
-					This project is totally open source, built with the support of a lot of wonderful works. Here the list:
+				<p>This project is totally open source, built with the support of a lot of wonderful works. Here the list:</p>
 					<br>
 					<ul>
-						<li><b>Android</b>:</li>
-						<ul>
-							<li>Keepass2Android - <a href="http://keepass2android.codeplex.com/SourceControl/latest">http://keepass2android.codeplex.com/SourceControl/latest</a></li>
+						<li><b>Android</b><ul>
+							<li>Keepass2Android - <a href="http://keepass2android.codeplex.com/SourceControl/latest">http://keepass2android.codeplex.com/</a></li>
 							<li>ZXing Embedded - <a href="https://github.com/journeyapps/zxing-android-embedded">https://github.com/journeyapps/zxing-android-embedded</a></li>
 							<li>Sweet Alert for Android - <a href="https://github.com/pedant/sweet-alert-dialog">https://github.com/pedant/sweet-alert-dialog</a></li>
-						</ul>
+						</ul></li>
 					</ul>
 					<ul>
-						<li><b>Web</b>:</li>
-						<ul>
+						<li><b>Web</b><ul>
 							<li>Skelethon - <a href="http://getskeleton.com/">http://getskeleton.com/</a></li>
 							<li>Font Awasome - <a href="http://fontawesome.io/">http://fontawesome.io/</a></li>
 							<li>JQuery - <a href="http://jquery.com/">http://jquery.com/</a></li>
 							<li>QR JS library - <a href="https://davidshimjs.github.io/qrcodejs/">https://davidshimjs.github.io/qrcodejs/</a></li>
-						</ul>
+						</ul></li>
 					</ul>
-				</p>
 			</div>
 			
 			<div id="contribute" class="container docs-section">
 				<h2>Contribute</h2>
 				<p>
-					KeeLink is a <a>free and no-profit application</a>. If you like and use this application consider to support 
+					KeeLink is a <b>free and no-profit application</b>. If you like and use this application consider to support 
 					me by sharing it with other people. Remember that is also possible to <b>donate something</b> in order to support 
-					the development and maintenance of all its parts.
-					<div align="center">
-						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-							<input type="hidden" name="cmd" value="_s-xclick">
-							<input type="hidden" name="hosted_button_id" value="P4B9MDV9WYDS2">
-							<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
-							<img alt="" border="0" src="https://www.paypalobjects.com/it_IT/i/scr/pixel.gif" width="1" height="1">
-						</form>
-					</div>
+					the development and maintenance of all its parts.				
 				</p>
+				<div align="center">
+					<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+						<input type="hidden" name="cmd" value="_s-xclick">
+						<input type="hidden" name="hosted_button_id" value="P4B9MDV9WYDS2">
+						<input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online!">
+						<img alt="" border="0" src="https://www.paypalobjects.com/it_IT/i/scr/pixel.gif" width="1" height="1">
+					</form>
+				</div>
 			</div>
 			
 			<div class="container docs-section">
 				<div class="row">
 						<div class="six columns"><p>Brought to you by <b>Andrea Cioni</b></p></div>
-						<div class="six columns"><p>Hosted for free on <a href="https://www.openshift.com/"><img height="16px" src="images/openshift_logo.png" /></a></p></div>
-						<div align="center" class="ten columns"><p><a href="https://github.com/andreacioni/KeeLink"><img height="50px" src="images/github_logo.png" /></a></p></div>
+						<div class="six columns"><p>Hosted for free on <a href="https://www.openshift.com/"><img height="16" src="images/openshift_logo.png" /></a></p></div>
+						<div align="center" class="ten columns"><p><a href="https://github.com/andreacioni/KeeLink"><img height="50" src="images/github_logo.png" /></a></p></div>
 				</div>
 			</div>
 		</div>
