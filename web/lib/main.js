@@ -13,6 +13,9 @@ $(document).ready(
 		init();
 
 		function init() {
+
+			detectHttpProtocol();
+
 			if(_query_string && (_query_string.onlyinfo === true || _query_string.onlyinfo === 'true')) {
 				$("#qrplaceholder").hide();
 			} else {
@@ -44,6 +47,23 @@ $(document).ready(
 				}, 500);
 				return false;
 			});
+		}
+
+		function detectHttpProtocol() {
+			if (window.location.protocol != "https:") {
+				swal({
+					title: "Are you sure?",
+					text: "You will not be able to recover this imaginary file!",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonText: "Go safe!",
+					cancelButtonText: "Stay here...",
+					closeOnConfirm: false
+					},
+					function(){
+					window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+				});
+			}
 		}
 
 		function parseWindowURL() {
@@ -101,7 +121,6 @@ $(document).ready(
 			$("#copyBtn").attr("data-clipboard-text",password);
 			
 			new Clipboard('#copyBtn');
-			new Clipboard('#moreBtn');
 			new Clipboard('#clearBtn');
 		}
 

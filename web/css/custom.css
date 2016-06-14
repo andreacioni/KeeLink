@@ -1,3 +1,8 @@
+#logo-container img {
+  height: 80px;
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
 
 #qrcode {
   transition-property: opacity;
@@ -22,7 +27,7 @@
 }
 
 #content{
-  margin-top: 100px;
+  margin-top:  10px;
   z-index: 0;
   position: absolute;
 }

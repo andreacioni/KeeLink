@@ -331,7 +331,9 @@ public class MainActivity extends AppCompatActivity {
                     validSidReceived(content, passwordReceived);
                 } else {
                     Log.e(TAG, "Invalid code:" + content);
-                    Toast.makeText(this, "Invalid QR code scanned!", Toast.LENGTH_SHORT).show();
+                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Error")
+                            .setContentText("This is not a KeeLink QR code!").show();
                 }
 
             }
@@ -350,15 +352,20 @@ public class MainActivity extends AppCompatActivity {
             keeLink.sendKey(sid, password, new AsyncPostResponse() {
                 @Override
                 public void response(boolean result) {
-                    if (result)
-                        Toast.makeText(getApplicationContext(), "Password correctly sent", Toast.LENGTH_SHORT).show();
-                    else
-                        Toast.makeText(getApplicationContext(), "Password NOT correctly sent. Try again...", Toast.LENGTH_SHORT).show();
+                    if (result) {
+                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                                .setTitleText("OK")
+                                .setContentText("Password was sent, wait the arriving on your page!").show();
+                    }
+                    else {
+                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
+                                .setTitleText("Error")
+                                .setContentText("There was an error comunicating with the server, try again.").show();
+                    }
 
                 }
             });
-        } else
-            Toast.makeText(this, "No network connection available!", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

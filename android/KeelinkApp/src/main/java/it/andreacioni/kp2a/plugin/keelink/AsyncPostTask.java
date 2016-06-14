@@ -28,6 +28,7 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
 
     private static final String USER_AGENT = "Mozilla/5.0";
 
+
     private AsyncPostResponse responseCallback = null;
 
     public AsyncPostTask(AsyncPostResponse r) {
