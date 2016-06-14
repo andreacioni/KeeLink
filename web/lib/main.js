@@ -38,15 +38,7 @@ $(document).ready(
 				,"json");
 			}
 			
-			//Enable scrolling effect on anchor clicking
-			var _root = $('html, body');
-			$('a.navbar-link').click(function(event){
-				event.preventDefault();
-				_root.animate({
-					scrollTop: $( $(this).attr('href') ).offset().top
-				}, 500);
-				return false;
-			});
+			
 		}
 
 		function detectHttpProtocol() {
