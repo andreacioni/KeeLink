@@ -323,8 +323,6 @@ public class MainActivity extends AppCompatActivity {
             if (content != null) {
 
                 Log.d(TAG, "Scanned");
-                Log.d(TAG, "Pass:" + passwordReceived);
-
                 if (content.startsWith(KeeLink.QR_CODE_PREFIX)) {
                     content = content.substring(KeeLink.QR_CODE_PREFIX.length());
                     Log.d(TAG, "Valid code scanned:" + content);
@@ -355,12 +353,14 @@ public class MainActivity extends AppCompatActivity {
                     if (result) {
                         new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
                                 .setTitleText("OK")
-                                .setContentText("Password was sent, wait the arriving on your page!").show();
+                                .setContentText("Password was sent, wait the arriving on your page!")
+                                .show();
                     }
                     else {
                         new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Error")
-                                .setContentText("There was an error comunicating with the server, try again.").show();
+                                .setContentText("There was an error comunicating with the server, try again.")
+                                .show();
                     }
 
                 }

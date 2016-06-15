@@ -1,4 +1,4 @@
-$(document).ready(
+$(document).load(
 	function () {
 		const INVALIDATE_TIMEOUT_SEC = 50;
 		const REQUEST_INTERVAL = 2000;
@@ -38,6 +38,15 @@ $(document).ready(
 				,"json");
 			}
 			
+			//Enable scrolling effect on anchor clicking
+			var _root = $('html, body');
+			$('a.navbar-link').click(function(event){
+				event.preventDefault();
+				_root.animate({
+					scrollTop: $( $(this).attr('href') ).offset().top
+				}, 500);
+				return false;
+			});
 			
 		}
 
@@ -45,7 +54,7 @@ $(document).ready(
 			if (window.location.protocol != "https:") {
 				swal({
 					title: "Are you sure?",
-					text: "You will not be able to recover this imaginary file!",
+					text: "This connection is using HTTP protocol so is not secure, would you like to use HTTPS secure protocol?",
 					type: "warning",
 					showCancelButton: true,
 					confirmButtonText: "Go safe!",
