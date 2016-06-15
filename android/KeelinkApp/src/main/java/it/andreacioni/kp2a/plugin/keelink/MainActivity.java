@@ -154,11 +154,12 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.howto:
-                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/#howto?onlyinfo=true");
+                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=howto&onlyinfo=true");
                 break;
             case R.id.about:
-                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/#credits?onlyinfo=true");
+                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=credits&onlyinfo=true");
                 break;
+
             case R.id.enable_plugin:
                 enableDisablePlugin();
                 break;

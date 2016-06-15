@@ -12,4 +12,5 @@
     <string name="kp2aplugin_menu_entry">Send</string>
 
     <string name="kp2aplugin_loading_entry">Processing</string>
+    <string name="onlineInfoText">Online on https://keelink.cloud</string>
 </resources>
