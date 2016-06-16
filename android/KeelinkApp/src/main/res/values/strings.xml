@@ -9,6 +9,8 @@
     <string name="kp2aplugin_shortdesc">Send password from Keepass to other devices </string>
     <string name="kp2aplugin_author">Andrea Cioni</string>
 
+    <string name="app_version">1.0.1</string>
+
     <string name="kp2aplugin_menu_entry">Send</string>
 
     <string name="kp2aplugin_loading_entry">Processing</string>

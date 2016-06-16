@@ -67,7 +67,7 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
                 Map<String,String> map = new HashMap<String,String>();
                 while(iter.hasNext()) {
                     String key = iter.next();
-                    map.put(key, (key.equals(KeepassDefs.TitleField)?"":(key + ": ")) + (obj.getString(key).equals("")?"<no supplied>":obj.getString(key)));
+                    map.put(key, (key.equals(KeepassDefs.TitleField)?"":(key + ": ")) + (obj.getString(key).equals("")?KeelinkDefs.STR_NOT_SUPPLIED:obj.getString(key)));
                 }
 
                 data.add(map);

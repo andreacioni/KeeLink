@@ -252,15 +252,15 @@ public class MainActivity extends AppCompatActivity {
 
     private String prepareSearchText(Map<String, String> selected) {
         String ret = "";
-        String title = selected.get(KeepassDefs.TitleField);
-        String user = selected.get(KeepassDefs.UserNameField);
+        String title = selected.get(KeepassDefs.TitleField).trim();
+        String user = selected.get(KeepassDefs.UserNameField).substring(KeepassDefs.UserNameField.length() + 1).trim();
         /*String note = selected.get(KeepassDefs.NotesField);
         String url = selected.get(KeepassDefs.url)*/
 
-        if (title != null && !title.trim().isEmpty())
+        if (title != null && !title.isEmpty() && !title.equals(KeelinkDefs.STR_NOT_SUPPLIED))
             ret += title.trim() + " ";
 
-        if (user != null && !user.substring(KeepassDefs.UserNameField.length() + 1).trim().isEmpty())
+        if (user != null && !user.isEmpty() && !user.equals(KeelinkDefs.STR_NOT_SUPPLIED))
             ret += user.substring(KeepassDefs.UserNameField.length() + 1).trim() + " ";
 
         /*if(note != null && note.substring(KeepassDefs.NotesField.length()+1).trim().isEmpty())
