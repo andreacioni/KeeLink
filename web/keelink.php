@@ -19,7 +19,7 @@ class KeeLink {
             $jresp['message'] = "Error(4): Chapta required";
         } else {
             $sqlInserUser = "INSERT INTO `USER`(`USER_ID`) VALUES ('" . $_SERVER['REMOTE_ADDR'] . "') ON DUPLICATE KEY UPDATE USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
-            $sqlInsertSID = "INSERT INTO `KEEPASS`(`SESSION_ID`,`USER_ID`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."') ON DUPLICATE KEY UPDATE KEEPASS.CREATION_DATE=CURRENT_TIMESTAMP";
+            $sqlInsertSID = "INSERT IGNORE INTO `KEEPASS`(`SESSION_ID`,`USER_ID`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."')";
             
             if ($conn->query($sqlInserUser) === TRUE) {
                 if ($conn->query($sqlInsertSID) === TRUE) {
