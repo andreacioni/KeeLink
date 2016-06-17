@@ -1,4 +1,4 @@
-# KeeLink <img src="https://travis-ci.org/andreacioni/KeeLink.svg?branch=master"/>
+# KeeLink
 
 <p>Keepass2Android QR Plug-In Utility</p>
 
