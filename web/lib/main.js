@@ -128,6 +128,8 @@ function initClipboardButton(password) {
 	
 	new Clipboard('#copyBtn');
 	new Clipboard('#clearBtn');
+
+	$("#clearBtn").click(function() { alertSuccess("Ok","Clipboard cleared!"); });
 }
 
 function initQrCode() {
