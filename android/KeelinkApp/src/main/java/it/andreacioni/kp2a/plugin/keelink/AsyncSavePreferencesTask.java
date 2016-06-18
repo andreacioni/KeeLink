@@ -25,8 +25,8 @@ public class AsyncSavePreferencesTask extends AsyncTask<Void,Void,Void> {
     private String id;
     private Context ctx = null;
 
-    public AsyncSavePreferencesTask(ProgressDialog d, String id, String json) {
-        this.dialog = d;
+    public AsyncSavePreferencesTask(Context ctx,String id, String json) {
+        this.dialog = KeeLinkUtils.setupProgressDialog(ctx);
         this.json = json;
         this.id = id;
         this.ctx = dialog.getContext();

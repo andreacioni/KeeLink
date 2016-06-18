@@ -1,5 +1,6 @@
 package it.andreacioni.kp2a.plugin.keelink;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,8 +18,8 @@ public class KeeLink {
         this.ctx = ctx;
     }
 
-    public void sendKey(String sid, String key,AsyncPostResponse response) {
-        AsyncPostTask post = new AsyncPostTask(response);
+    public void sendKey(String sid, String key, AsyncPostResponse response) {
+        AsyncPostTask post = new AsyncPostTask(ctx,response);
         post.execute(KeelinkDefs.TARGET_SITE, sid, key);
     }
 

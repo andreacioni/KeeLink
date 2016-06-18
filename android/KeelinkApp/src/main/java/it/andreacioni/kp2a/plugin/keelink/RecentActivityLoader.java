@@ -38,8 +38,8 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
 
     private ListView listView = null;
 
-    public RecentActivityLoader(ProgressDialog dialog,ListView vList) {
-        this.dialog = dialog;
+    public RecentActivityLoader(Context ctx,ListView vList) {
+        this.dialog = KeeLinkUtils.setupProgressDialog(ctx);
         this.ctx = dialog.getContext();
         this.listView = vList;
     }

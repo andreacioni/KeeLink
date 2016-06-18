@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACTIVITY_ENABLE_DISABLE = 123;
     private static final int START_KEEPASS_CODE = 399;
 
-    private ProgressDialog progressDialog = null;
     private String passwordReceived = null;
     private KeeLink keeLink = new KeeLink(this);
 
@@ -50,13 +49,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
-        setupProgressDialog();
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        new RecentActivityLoader(progressDialog, (ListView) findViewById(R.id.recent_list)).execute();
+        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
         prepareListView();
 
         if (snackStatusShow()) {
@@ -74,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.e(TAG, "Password parsing error" + e.getMessage());
                     }
 
-                    new AsyncPostTask.AsyncSavePreferencesTask(progressDialog, i.getStringExtra(Strings.EXTRA_ENTRY_ID), i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).execute();
+                    new AsyncSavePreferencesTask(MainActivity.this,i.getStringExtra(Strings.EXTRA_ENTRY_ID), i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).execute();
                     startScanActivity();
                 }
             } else {
@@ -102,14 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private void setupProgressDialog() {
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setCancelable(false);
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.setMessage("Loading...");
     }
 
     @Override
@@ -261,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
             ret += title.trim() + " ";
 
         if (user != null && !user.isEmpty() && !user.equals(KeelinkDefs.STR_NOT_SUPPLIED))
-            ret += user.substring(KeepassDefs.UserNameField.length() + 1).trim() + " ";
+            ret += user + " ";
 
         /*if(note != null && note.substring(KeepassDefs.NotesField.length()+1).trim().isEmpty())
             ret += note.substring(KeepassDefs.NotesField.length()+1).trim() + " ";*/
