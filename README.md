@@ -1,8 +1,12 @@
-# KeeLink <img src="https://travis-ci.org/andreacioni/KeeLink.svg?branch=master"/>
+# KeeLink
 
 <p>Keepass2Android QR Plug-In Utility</p>
 
 <p>Started on: 21/5/2016</p>
+
+More info: <a href="https://keelink.cloud?onlyinfo=true">here</a>
+
+<b>Web App</b>: <a href="https://keelink.cloud">here</a>
 
 <p>Based on work of: </p>
 <ul>
