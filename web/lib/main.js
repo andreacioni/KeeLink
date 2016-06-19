@@ -15,23 +15,7 @@ function init() {
 		$("#qrplaceholder").hide();
 	} else {
 		detectHttpProtocol();
-		$.post("init.php",{},"json").done(
-			function(data) {
-				if(data.status === true) {
-					_sid = data['message'];
-					
-					if(!checkBrowserSupport()) {
-						alertError("Your browser is up to date, please use newer browser");
-					} else {
-						$("#sidLabel").text(_sid);
-						initQrCode();
-						initAsyncAjaxRequest();
-					}
-				} else {
-					alertError("Cannot initialize KeeLink",data.message);
-				}
-			}
-		);
+		requestInit();
 	}
 
 		//Enable scrolling effect on anchor clicking
@@ -49,6 +33,30 @@ function init() {
 		//window.location.hash = "#" + _query_string.show;
 	}
 	
+}
+
+function requestInit() {
+	$.post("init.php",{},"json").done(
+		function(data) {
+			if(data.status === true) {
+				_sid = data['message'];
+				
+				if(!checkBrowserSupport()) {
+					alertError("Your browser is up to date, please use newer browser");
+				} else {
+					$("#sidLabel").text(_sid);
+					initQrCode();
+					initAsyncAjaxRequest();
+				}
+			} else {
+				alertError("Cannot initialize KeeLink",data.message);
+			}
+		}
+	).fail(
+		function() {
+			alertError("Error","Cannot initilize this service");
+		}
+	);
 }
 
 function detectHttpProtocol() {
