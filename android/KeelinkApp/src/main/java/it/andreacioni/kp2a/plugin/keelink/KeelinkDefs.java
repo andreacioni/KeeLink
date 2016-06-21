@@ -22,16 +22,4 @@ public class KeelinkDefs {
 
     public static final String STR_NOT_SUPPLIED = "<no supplied>";
 
-    public static void setFastFlag(Context ctx, boolean b) {
-        SharedPreferences pref = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE,Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(KeelinkDefs.FLAG_FAST_SEND,b);
-        editor.commit();
-    }
-
-    public static boolean getFastFlag(Context ctx) {
-        SharedPreferences pref = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE,Context.MODE_PRIVATE);
-        return pref.getBoolean(KeelinkDefs.FLAG_FAST_SEND,false);
-    }
-
 }

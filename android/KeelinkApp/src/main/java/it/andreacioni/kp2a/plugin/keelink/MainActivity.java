@@ -2,19 +2,24 @@ package it.andreacioni.kp2a.plugin.keelink;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.MenuItemImpl;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -77,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
-                KeelinkDefs.setFastFlag(this,false);
+                KeeLinkUtils.setFastFlag(this,false);
             }
         }
     }
@@ -96,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                             .show();
                 } else {
                     selected = (Map<String, String>) adapterView.getItemAtPosition(i);
-                    KeelinkDefs.setFastFlag(getApplicationContext(),true);
+                    KeeLinkUtils.setFastFlag(getApplicationContext(),true);
                 }
             }
         });
@@ -127,11 +132,40 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        prepareMenu(menu);
+
         return true;
+    }
+
+    private void prepareMenu(Menu m) {
+        if(m != null) {
+            SwitchCompat switchh = (SwitchCompat) ((MenuItemImpl) m.findItem(R.id.menu_item_switch)).getActionView().findViewById(R.id.pluginEnabledSwitch);
+            if(isKeepassInstalled()) {
+                switchh.setEnabled(true);
+                switchh.setChecked(isEnabled());
+                switchh.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        enableDisablePlugin();
+                    }
+                });
+            } else
+                switchh.setChecked(false);
+
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                String version = pInfo.versionName;
+                m.findItem(R.id.menuVersion).setTitle("v:" + version);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -148,10 +182,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.about:
                 openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=credits&onlyinfo=true");
-                break;
-
-            case R.id.enable_plugin:
-                enableDisablePlugin();
                 break;
         }
 
@@ -180,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         boolean ret = false;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         if(isKeepassInstalled()) {
             if (!isEnabled()) {
                 Snackbar.make(fab, "Not enabled as plugin", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
@@ -217,7 +248,7 @@ public class MainActivity extends AppCompatActivity {
                                 @Override
                                 public void onClick(SweetAlertDialog sDialog) {
                                     sDialog.dismissWithAnimation();
-                                    KeelinkDefs.setFastFlag(getApplicationContext(),true);
+                                    KeeLinkUtils.setFastFlag(getApplicationContext(),true);
                                     openKeepass();
                                 }
                             })
@@ -308,6 +339,9 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult reqCode=" + requestCode + " resultCode=" + resultCode + " data=" + data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
+        supportInvalidateOptionsMenu();
+
         if (result != null && passwordReceived != null) {
             String content = result.getContents();
 

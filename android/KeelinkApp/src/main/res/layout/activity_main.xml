@@ -37,6 +37,6 @@
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_gravity="bottom|end" android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/link_icon"
-        app:backgroundTint="#00BA19" />
+        app:backgroundTint="@color/colorAccent" />
 
 </android.support.design.widget.CoordinatorLayout>

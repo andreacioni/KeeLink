@@ -15,4 +15,5 @@
 
     <string name="kp2aplugin_loading_entry">Processing</string>
     <string name="onlineInfoText">Online on https://keelink.cloud</string>
+    <string name="versionPlaceholder">v:1.0.0</string>
 </resources>
