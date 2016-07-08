@@ -77,8 +77,6 @@ function detectHttpProtocol() {
 }
 
 function parseWindowURL() {
-	// This function is anonymous, is executed immediately and 
-	// the return value is assigned to QueryString!
 	var query_string = {};
 	var query = window.location.href.split("?")[1];
 	if(query) {
@@ -137,7 +135,10 @@ function initClipboardButton(password) {
 	new Clipboard('#copyBtn');
 	new Clipboard('#clearBtn');
 
-	$("#clearBtn").click(function() { alertSuccess("Ok","Clipboard cleared!"); });
+	$("#clearBtn").click(function() { 
+		alertSuccess("Ok","Clipboard cleared!"); 
+		$("#moreBtn").click();
+	});
 }
 
 function initQrCode() {
@@ -194,7 +195,7 @@ function checkBrowserSupport(params) {
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
 		initClipboardButton(data.message);
-		alertSuccess("Password received!","Would you copy password on clipboard?");
+		alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
 	}

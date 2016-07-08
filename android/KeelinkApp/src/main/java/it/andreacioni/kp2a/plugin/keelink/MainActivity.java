@@ -1,7 +1,9 @@
 package it.andreacioni.kp2a.plugin.keelink;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -9,11 +11,13 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -26,6 +30,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,7 +42,7 @@ import keepass2android.pluginsdk.KeepassDefs;
 import keepass2android.pluginsdk.Kp2aControl;
 import keepass2android.pluginsdk.Strings;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActionMode.Callback{
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -49,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Map<String, String> selected = null;
 
+    private ActionMode mActionMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate");
@@ -57,10 +64,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setSubtitle(R.string.onlineInfoText);
         setSupportActionBar(toolbar);
-
-        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
-        prepareListView();
 
         if (snackStatusShow()) {
             if (savedInstanceState == null) {//condition ensure that the capture activity starts correctly TODO check this solution...
@@ -82,8 +87,10 @@ public class MainActivity extends AppCompatActivity {
                 }
             } else {
                 passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
-                KeeLinkUtils.setFastFlag(this,false);
+
             }
+        } else {
+            KeeLinkUtils.setFastFlag(this,false);
         }
     }
 
@@ -101,7 +108,11 @@ public class MainActivity extends AppCompatActivity {
                             .show();
                 } else {
                     selected = (Map<String, String>) adapterView.getItemAtPosition(i);
-                    KeeLinkUtils.setFastFlag(getApplicationContext(),true);
+                    if(selected.get(KeelinkDefs.GUID_FIELD) != "0") {
+                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        mActionMode = startSupportActionMode(MainActivity.this);
+                    } else
+                        Log.w(TAG,"Cannot select placeholder entry");
                 }
             }
         });
@@ -125,11 +136,9 @@ public class MainActivity extends AppCompatActivity {
         snackStatusShow();
 
         ((ListView) findViewById(R.id.recent_list)).setSelection(ListView.INVALID_POSITION);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
+        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
+        prepareListView();
+        reloadList();
     }
 
 
@@ -335,6 +344,22 @@ public class MainActivity extends AppCompatActivity {
         integrator.initiateScan();
     }
 
+    private void reloadList() {
+        ListView lv = (ListView) findViewById(R.id.recent_list);
+        lv.clearChoices();
+        lv.requestLayout();
+    }
+
+    private void removeSelectedEntry() {
+        SharedPreferences pref = getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE, Context.MODE_PRIVATE);
+        try {
+            JSONArray jArray = new JSONArray(pref.getString(KeelinkDefs.RECENT_PREFERENCES_ENTRY,"[]"));
+        } catch (JSONException e) { Log.e(TAG,"Not a valid selected item" + selected.toString()); }
+        String id = selected.get(KeelinkDefs.GUID_FIELD);
+        JSONObject obj = new JSONObject(selected);
+        new AsyncSavePreferencesTask(this,id,obj.toString(),true).execute();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult reqCode=" + requestCode + " resultCode=" + resultCode + " data=" + data);
@@ -394,4 +419,34 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.menu_list_selection, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.delete_menu_entry:
+                removeSelectedEntry();
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        reloadList();
+        selected = null;
+        mActionMode = null;
+    }
 }

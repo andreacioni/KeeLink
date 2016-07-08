@@ -4,6 +4,10 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by andreacioni on 16/06/16.
  */
@@ -28,5 +32,17 @@ public class KeeLinkUtils {
     public static boolean getFastFlag(Context ctx) {
         SharedPreferences pref = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE,Context.MODE_PRIVATE);
         return pref.getBoolean(KeelinkDefs.FLAG_FAST_SEND,false);
+    }
+
+    public static int guidExist(JSONArray array, String aLong) throws JSONException {
+        for(int i=0;i<array.length();i++) {
+            JSONObject obj = array.getJSONObject(i);
+
+            if(obj.get(KeelinkDefs.GUID_FIELD).equals(aLong)) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

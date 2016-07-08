@@ -18,6 +18,10 @@
     <item android:title="@string/about"
         android:id="@+id/about" />
 
+    <item android:icon="@drawable/ic_language_white_24dp"
+        app:showAsAction="ifRoom"
+        android:title="@string/onlineIconText"/>
+
     <item android:title="@string/versionPlaceholder"
         android:id="@+id/menuVersion"
         android:checkable="false"

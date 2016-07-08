@@ -12,6 +12,13 @@
             <option value="$PROJECT_DIR$/keepass2AndroidPluginSDK" />
           </set>
         </option>
+        <option name="myModules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/KeelinkApp" />
+            <option value="$PROJECT_DIR$/keepass2AndroidPluginSDK" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
