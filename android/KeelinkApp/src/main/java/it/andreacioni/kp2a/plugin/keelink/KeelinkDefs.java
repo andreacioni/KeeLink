@@ -20,6 +20,8 @@ public class KeelinkDefs {
 
     public static final int MAX_RECENT_HISTORY_LENGHT = 30;
 
-    public static final String STR_NOT_SUPPLIED = "<no supplied>";
+    public static final String STR_NOT_SUPPLIED = "<not supplied>";
+
+    public static final String USERNAME_HIDDEN_FIELD = "UserNameHidden";
 
 }

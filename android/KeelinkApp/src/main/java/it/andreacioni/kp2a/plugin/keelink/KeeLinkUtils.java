@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.Charset;
+
 /**
  * Created by andreacioni on 16/06/16.
  */
@@ -44,5 +46,24 @@ public class KeeLinkUtils {
         }
 
         return -1;
+    }
+
+    public static String hideUsernameString(String username) {
+        String clone = new String(username);
+        char us[] = username.toCharArray();
+        if (username.length() >5) {
+            for (int i=2;i<username.length()-2;i++){
+                us[i]= '*';
+                clone = new String(us);
+            }
+        } else{
+            for (int i=1;i<username.length();i++){
+                us[i]= '*';
+                clone = new String(us);
+
+            }
+        }
+
+        return clone;
     }
 }

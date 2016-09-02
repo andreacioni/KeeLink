@@ -9,7 +9,29 @@
         android:layout_height="wrap_content"
         android:id="@+id/pluginEnabledSwitch"
         android:text=" "
+        android:visibility="visible"
         android:layout_centerVertical="true"
-        android:visibility="visible" />
+        android:layout_toRightOf="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="ON"
+        android:id="@+id/textView"
+        android:layout_alignTop="@+id/textView2"
+        android:layout_toRightOf="@+id/pluginEnabledSwitch"
+        android:layout_toEndOf="@+id/pluginEnabledSwitch" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="OFF"
+        android:id="@+id/textView2"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

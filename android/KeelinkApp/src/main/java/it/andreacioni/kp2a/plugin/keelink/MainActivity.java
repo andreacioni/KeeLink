@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setSubtitle(R.string.onlineInfoText);
         setSupportActionBar(toolbar);
 
         if (snackStatusShow()) {
@@ -100,6 +99,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.d(TAG, adapterView.getItemAtPosition(i).toString());
+
+                if(mActionMode != null) {
+                    mActionMode.finish();
+                }
+
                 if (selected != null && selected.equals((Map<String, String>) adapterView.getItemAtPosition(i))) {
                     new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
                             .setTitleText("Just another click")
@@ -136,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         snackStatusShow();
 
         ((ListView) findViewById(R.id.recent_list)).setSelection(ListView.INVALID_POSITION);
-        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
         prepareListView();
         reloadList();
     }
@@ -186,6 +189,12 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         //noinspection SimplifiableIfStatement
         switch (id) {
+            case R.id.go_online:
+                new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
+                    .setTitleText("KeeLink")
+                    .setContentText("The other part of this application is placed online on https://keelink.cloud")
+                    .show();
+                break;
             case R.id.howto:
                 openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=howto&onlyinfo=true");
                 break;
@@ -347,6 +356,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     private void reloadList() {
         ListView lv = (ListView) findViewById(R.id.recent_list);
         lv.clearChoices();
+        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
+        lv.invalidateViews();
         lv.requestLayout();
     }
 
@@ -437,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         switch (id) {
             case R.id.delete_menu_entry:
                 removeSelectedEntry();
+                mActionMode.finish();
                 return true;
         }
 

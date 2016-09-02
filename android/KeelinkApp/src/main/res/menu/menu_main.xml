@@ -19,6 +19,7 @@
         android:id="@+id/about" />
 
     <item android:icon="@drawable/ic_language_white_24dp"
+        android:id="@+id/go_online"
         app:showAsAction="ifRoom"
         android:title="@string/onlineIconText"/>
 

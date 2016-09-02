@@ -100,7 +100,7 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
             data.add(placeholder);
         }
 
-        SimpleAdapter adapter = new SimpleAdapter(ctx, data,R.layout.recent_list_row, new String[] { KeepassDefs.TitleField,KeepassDefs.UserNameField,KeepassDefs.UrlField },
+        SimpleAdapter adapter = new SimpleAdapter(ctx, data,R.layout.recent_list_row, new String[] { KeepassDefs.TitleField,KeelinkDefs.USERNAME_HIDDEN_FIELD,KeepassDefs.UrlField },
                 new int[] { R.id.recent_row_title, R.id.recent_row_user, R.id.recent_row_url });
         listView.setAdapter(adapter);
     }
