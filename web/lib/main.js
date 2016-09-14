@@ -3,6 +3,10 @@ $(init);
 var INVALIDATE_TIMEOUT_SEC = 50;
 var REQUEST_INTERVAL = 2000;
 
+var REMINDER_DELETE_CLIPBOARD = 10000;
+var REMINDER_TITLE = "Don't forget!";
+var REMINDER_BODY = "Remember to clear your clipboard, your password is still there!";
+
 var _sid;
 var invalidateSid = false;
 var requestFinished = true;
@@ -188,8 +192,27 @@ function alertError(title,msg) {
 	});
 }
 
-function checkBrowserSupport(params) {
+function checkBrowserSupport() {
 	return "XMLHttpRequest" in window;
+}
+
+function checkNotificationSupport() {
+	return "Notification" in window;
+}
+
+function remindDelete() {
+	setTimeout(function() {
+		if (Notification.permission === "granted") {
+			var notification = new Notification(REMINDER_TITLE,{"body":REMINDER_BODY});
+		}
+		else if (Notification.permission !== 'denied') {
+			Notification.requestPermission(function (permission) {
+			if (permission === "granted") {
+				var notification = new Notification("Hi there!");
+			}
+			});
+		}
+	},REMINDER_DELETE_CLIPBOARD);
 }
 
 function onSuccess(data,textStatus,jqXhr) {
@@ -198,6 +221,7 @@ function onSuccess(data,textStatus,jqXhr) {
 		alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
+		remindDelete();
 	}
 }
 
