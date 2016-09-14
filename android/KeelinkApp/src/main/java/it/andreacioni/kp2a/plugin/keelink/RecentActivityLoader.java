@@ -48,6 +48,8 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
     protected void onPreExecute() {
         data = new ArrayList<Map<String,String>>();
         dialog.show();
+
+        listView.clearChoices();
     }
 
     @Override
@@ -56,6 +58,8 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
         SharedPreferences preferences = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE, Context.MODE_PRIVATE);
         String jsonPref = preferences.getString(KeelinkDefs.RECENT_PREFERENCES_ENTRY,"[]");
         JSONArray jsonArray = null;
+
+        Log.d(TAG,"Recent array:" + jsonPref.toString());
 
         try {
             jsonArray = new JSONArray(jsonPref);
@@ -100,8 +104,15 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
             data.add(placeholder);
         }
 
-        SimpleAdapter adapter = new SimpleAdapter(ctx, data,R.layout.recent_list_row, new String[] { KeepassDefs.TitleField,KeelinkDefs.USERNAME_HIDDEN_FIELD,KeepassDefs.UrlField },
+        Log.d(TAG,"Data array: " + data.toString());
+
+        SimpleAdapter adapter = new SimpleAdapter(ctx, data,R.layout.recent_list_row, new String[] { KeepassDefs.TitleField,KeepassDefs.UserNameField,KeepassDefs.UrlField },
                 new int[] { R.id.recent_row_title, R.id.recent_row_user, R.id.recent_row_url });
         listView.setAdapter(adapter);
+
+        listView.invalidateViews();
+        listView.requestLayout();
+
+        Log.d(TAG,"List reloaded");
     }
 }

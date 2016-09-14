@@ -81,9 +81,11 @@ public class AsyncSavePreferencesTask extends AsyncTask<Void,Void,Void> {
 
                     String username = o.getString(KeepassDefs.UserNameField);
                     if(username != null && !username.isEmpty()) {
-                        o.put(KeepassDefs.UserNameField,username);
-                        o.put(KeelinkDefs.USERNAME_HIDDEN_FIELD,KeeLinkUtils.hideUsernameString(username));
+                        o.put(KeelinkDefs.USERNAME_VALID_FIELD,username);
+                        o.put(KeepassDefs.UserNameField,KeeLinkUtils.hideUsernameString(username));
                     }
+
+                    Log.d(TAG,"Inserting entry: " + o.toString());
 
                     int ret = KeeLinkUtils.guidExist(array, (String) o.get(KeelinkDefs.GUID_FIELD));
 

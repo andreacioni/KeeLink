@@ -22,6 +22,8 @@ public class KeelinkDefs {
 
     public static final String STR_NOT_SUPPLIED = "<not supplied>";
 
-    public static final String USERNAME_HIDDEN_FIELD = "UserNameHidden";
+    public static final String USERNAME_VALID_FIELD = "UserNameValid";
+
+    public static final long FAST_MILLIS_VALIDITY = 30000;
 
 }

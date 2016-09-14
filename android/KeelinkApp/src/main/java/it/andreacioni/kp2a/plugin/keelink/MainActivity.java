@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -66,14 +65,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        prepareListView();
+
         if (snackStatusShow()) {
-            if (savedInstanceState == null) {//condition ensure that the capture activity starts correctly TODO check this solution...
+            if (savedInstanceState == null) {// this condition ensure that the capture activity starts correctly TODO check this solution...
                 Intent i = getIntent();
-                if ((i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
+
+                Log.d(TAG, "Intent is: " + i);
+
+                if (i.getExtras() != null && (i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
                         i.getStringExtra(Strings.EXTRA_ENTRY_ID) != null) {
 
-                    Log.d(TAG, i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
-                    Log.d(TAG, "Entry GUID: " + i.getStringExtra(Strings.EXTRA_ENTRY_ID));
+                    Log.i(TAG,"Password received from intent!");
 
                     try {
                         passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString(KeepassDefs.PasswordField);
@@ -85,24 +88,24 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     startScanActivity();
                 }
             } else {
+                Log.i(TAG,"Password received from savedInstanceState!");
                 passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
 
             }
         } else {
-            KeeLinkUtils.setFastFlag(this,false);
+            KeeLinkUtils.setFastFlag(getApplicationContext(),false);
         }
     }
 
+
     private void prepareListView() {
+
         ListView lv = (ListView) findViewById(R.id.recent_list);
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(final AdapterView<?> adapterView, View view, final int i, long l) {
                 Log.d(TAG, adapterView.getItemAtPosition(i).toString());
-
-                if(mActionMode != null) {
-                    mActionMode.finish();
-                }
 
                 if (selected != null && selected.equals((Map<String, String>) adapterView.getItemAtPosition(i))) {
                     new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
@@ -113,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 } else {
                     selected = (Map<String, String>) adapterView.getItemAtPosition(i);
                     if(selected.get(KeelinkDefs.GUID_FIELD) != "0") {
-                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
-                        mActionMode = startSupportActionMode(MainActivity.this);
+                        if(mActionMode == null)
+                            mActionMode = startSupportActionMode(MainActivity.this);
                     } else
                         Log.w(TAG,"Cannot select placeholder entry");
                 }
@@ -128,8 +131,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         if (passwordReceived != null) {
             outState.putString(Strings.EXTRA_ENTRY_OUTPUT_DATA, passwordReceived);
-            //outState.putString(Strings.EXTRA_FIELD_ID, launcherIntent.getStringExtra(Strings.EXTRA_FIELD_ID));
-            //outState.putString(Strings.EXTRA_SENDER, launcherIntent.getStringExtra(Strings.EXTRA_SENDER));
         }
 
     }
@@ -137,11 +138,16 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     @Override
     protected void onResume() {
         super.onResume();
-        snackStatusShow();
 
-        ((ListView) findViewById(R.id.recent_list)).setSelection(ListView.INVALID_POSITION);
-        prepareListView();
-        reloadList();
+        supportInvalidateOptionsMenu();
+
+        ListView l = ((ListView) findViewById(R.id.recent_list));
+        if(l != null) {
+            l.setSelection(ListView.INVALID_POSITION);
+            reloadList();
+        } else
+            Log.w(TAG,"Cannot invalidate position in list");
+        snackStatusShow();
     }
 
 
@@ -182,12 +188,10 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        Log.d(TAG,"onOptionsItemSelected, option ID:" + id);
+
         switch (id) {
             case R.id.go_online:
                 new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
@@ -201,6 +205,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             case R.id.about:
                 openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=credits&onlyinfo=true");
                 break;
+            default:
+                Log.w(TAG,"Not a valid ID");
         }
 
         return super.onOptionsItemSelected(item);
@@ -250,38 +256,37 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startScanActivity();
-                //LoadingOverlayFragment loading = new LoadingOverlayFragment();
-                //loading.show(getSupportFragmentManager(),"Title");
-                //Intent i = Kp2aControl.getOpenEntryIntent("",false,true);
-                //startActivityForResult(i,399)
+                if(snackStatusShow()) {
+                    if (selected == null) {
+                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
+                                .setTitleText("Hmmm not understanding...")
+                                .setContentText("No selection made, would you open Keepass2Android?")
+                                .setConfirmText("Yes")
+                                .setCancelText("Cancel")
+                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sDialog) {
+                                        sDialog.dismissWithAnimation();
+                                        KeeLinkUtils.setFastFlag(getApplicationContext(),true);
+                                        openKeepass();
+                                    }
+                                })
+                                .show();
+                    } else if ("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())) {
+                        Log.d(TAG, "Opening K2PA...");
 
-                if (selected == null) {
-                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                            .setTitleText("Hmmm not understanding...")
-                            .setContentText("No selection made, would you open Keepass2Android?")
-                            .setConfirmText("Yes")
-                            .setCancelText("Cancel")
-                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
-                                    sDialog.dismissWithAnimation();
-                                    KeeLinkUtils.setFastFlag(getApplicationContext(),true);
-                                    openKeepass();
-                                }
-                            })
-                            .show();
-                } else if ("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())) {
-                    Log.d(TAG, "Opening K2PA...");
-                    openKeepass();
-                } else {
-                    Log.d(TAG, "Sending entry...");
-                    String title = selected.get(KeepassDefs.TitleField);
-                    String user = selected.get(KeepassDefs.UserNameField);
+                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        openKeepass();
+                    } else {
+                        Log.d(TAG, "Sending entry...");
+                        String title = selected.get(KeepassDefs.TitleField);
+                        String user = selected.get(KeepassDefs.UserNameField);
 
-                    String searchString = prepareSearchText(selected);
+                        String searchString = prepareSearchText(selected);
 
-                    openKeepassForSearch(searchString);
+                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        openKeepassForSearch(searchString);
+                    }
                 }
             }
         });
@@ -292,9 +297,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     private String prepareSearchText(Map<String, String> selected) {
         String ret = "";
         String title = selected.get(KeepassDefs.TitleField).trim();
-        String user = selected.get(KeepassDefs.UserNameField).substring(KeepassDefs.UserNameField.length() + 1).trim();
+        String user = selected.get(KeelinkDefs.USERNAME_VALID_FIELD).substring(KeelinkDefs.USERNAME_VALID_FIELD.length() + 1).trim();
         /*String note = selected.get(KeepassDefs.NotesField);
         String url = selected.get(KeepassDefs.url)*/
+
+        Log.d(TAG,"Searching for -> TITLE:" + title + ", USER:" + user);
 
         if (title != null && !title.isEmpty() && !title.equals(KeelinkDefs.STR_NOT_SUPPLIED))
             ret += title.trim() + " ";
@@ -354,11 +361,9 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private void reloadList() {
+        Log.d(TAG,"Reloading list...");
         ListView lv = (ListView) findViewById(R.id.recent_list);
-        lv.clearChoices();
-        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
-        lv.invalidateViews();
-        lv.requestLayout();
+        new RecentActivityLoader(MainActivity.this,lv).execute();
     }
 
     private void removeSelectedEntry() {
@@ -368,6 +373,9 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         } catch (JSONException e) { Log.e(TAG,"Not a valid selected item" + selected.toString()); }
         String id = selected.get(KeelinkDefs.GUID_FIELD);
         JSONObject obj = new JSONObject(selected);
+
+        Log.d(TAG,"Removing object: " + obj.toString());
+
         new AsyncSavePreferencesTask(this,id,obj.toString(),true).execute();
     }
 
@@ -375,8 +383,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult reqCode=" + requestCode + " resultCode=" + resultCode + " data=" + data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-
-        supportInvalidateOptionsMenu();
 
         if (result != null && passwordReceived != null) {
             String content = result.getContents();
