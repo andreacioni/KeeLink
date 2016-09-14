@@ -1,26 +1,36 @@
 package it.andreacioni.kp2a.plugin.keelink;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
+import android.support.v7.view.menu.MenuItemImpl;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,7 +42,7 @@ import keepass2android.pluginsdk.KeepassDefs;
 import keepass2android.pluginsdk.Kp2aControl;
 import keepass2android.pluginsdk.Strings;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActionMode.Callback{
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -44,9 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
     private Map<String, String> selected = null;
 
+    private ActionMode mActionMode;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
@@ -54,17 +65,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        new RecentActivityLoader(MainActivity.this,(ListView) findViewById(R.id.recent_list)).execute();
         prepareListView();
 
         if (snackStatusShow()) {
-            if (savedInstanceState == null) {//condition ensure that the capture activity starts correctly TODO check this solution...
+            if (savedInstanceState == null) {// this condition ensure that the capture activity starts correctly TODO check this solution...
                 Intent i = getIntent();
-                if ((i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
+
+                Log.d(TAG, "Intent is: " + i);
+
+                if (i.getExtras() != null && (i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA) != null) &&
                         i.getStringExtra(Strings.EXTRA_ENTRY_ID) != null) {
 
-                    Log.d(TAG, i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
-                    Log.d(TAG, "Entry GUID: " + i.getStringExtra(Strings.EXTRA_ENTRY_ID));
+                    Log.i(TAG,"Password received from intent!");
 
                     try {
                         passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString(KeepassDefs.PasswordField);
@@ -76,18 +88,25 @@ public class MainActivity extends AppCompatActivity {
                     startScanActivity();
                 }
             } else {
+                Log.i(TAG,"Password received from savedInstanceState!");
                 passwordReceived = savedInstanceState.getString(Strings.EXTRA_ENTRY_OUTPUT_DATA);
-                KeelinkDefs.setFastFlag(this,false);
+
             }
+        } else {
+            KeeLinkUtils.setFastFlag(getApplicationContext(),false);
         }
     }
 
+
     private void prepareListView() {
+
         ListView lv = (ListView) findViewById(R.id.recent_list);
+
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(final AdapterView<?> adapterView, View view, final int i, long l) {
                 Log.d(TAG, adapterView.getItemAtPosition(i).toString());
+
                 if (selected != null && selected.equals((Map<String, String>) adapterView.getItemAtPosition(i))) {
                     new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
                             .setTitleText("Just another click")
@@ -96,7 +115,11 @@ public class MainActivity extends AppCompatActivity {
                             .show();
                 } else {
                     selected = (Map<String, String>) adapterView.getItemAtPosition(i);
-                    KeelinkDefs.setFastFlag(getApplicationContext(),true);
+                    if(selected.get(KeelinkDefs.GUID_FIELD) != "0") {
+                        if(mActionMode == null)
+                            mActionMode = startSupportActionMode(MainActivity.this);
+                    } else
+                        Log.w(TAG,"Cannot select placeholder entry");
                 }
             }
         });
@@ -108,8 +131,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (passwordReceived != null) {
             outState.putString(Strings.EXTRA_ENTRY_OUTPUT_DATA, passwordReceived);
-            //outState.putString(Strings.EXTRA_FIELD_ID, launcherIntent.getStringExtra(Strings.EXTRA_FIELD_ID));
-            //outState.putString(Strings.EXTRA_SENDER, launcherIntent.getStringExtra(Strings.EXTRA_SENDER));
         }
 
     }
@@ -117,42 +138,75 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        supportInvalidateOptionsMenu();
+
+        ListView l = ((ListView) findViewById(R.id.recent_list));
+        if(l != null) {
+            l.setSelection(ListView.INVALID_POSITION);
+            reloadList();
+        } else
+            Log.w(TAG,"Cannot invalidate position in list");
         snackStatusShow();
-
-        ((ListView) findViewById(R.id.recent_list)).setSelection(ListView.INVALID_POSITION);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        prepareMenu(menu);
+
         return true;
+    }
+
+    private void prepareMenu(Menu m) {
+        if(m != null) {
+            SwitchCompat switchh = (SwitchCompat) ((MenuItemImpl) m.findItem(R.id.menu_item_switch)).getActionView().findViewById(R.id.pluginEnabledSwitch);
+            if(isKeepassInstalled()) {
+                switchh.setEnabled(true);
+                switchh.setChecked(isEnabled());
+                switchh.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                        enableDisablePlugin();
+                    }
+                });
+            } else
+                switchh.setChecked(false);
+
+            try {
+                PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                String version = pInfo.versionName;
+                m.findItem(R.id.menuVersion).setTitle("v:" + version);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+        Log.d(TAG,"onOptionsItemSelected, option ID:" + id);
+
         switch (id) {
+            case R.id.go_online:
+                new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
+                    .setTitleText("KeeLink")
+                    .setContentText("The other part of this application is placed online on https://keelink.cloud")
+                    .show();
+                break;
             case R.id.howto:
                 openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=howto&onlyinfo=true");
                 break;
             case R.id.about:
                 openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=credits&onlyinfo=true");
                 break;
-
-            case R.id.enable_plugin:
-                enableDisablePlugin();
-                break;
+            default:
+                Log.w(TAG,"Not a valid ID");
         }
 
         return super.onOptionsItemSelected(item);
@@ -180,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
         boolean ret = false;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
         if(isKeepassInstalled()) {
             if (!isEnabled()) {
                 Snackbar.make(fab, "Not enabled as plugin", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
@@ -201,38 +256,37 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startScanActivity();
-                //LoadingOverlayFragment loading = new LoadingOverlayFragment();
-                //loading.show(getSupportFragmentManager(),"Title");
-                //Intent i = Kp2aControl.getOpenEntryIntent("",false,true);
-                //startActivityForResult(i,399)
+                if(snackStatusShow()) {
+                    if (selected == null) {
+                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
+                                .setTitleText("Hmmm not understanding...")
+                                .setContentText("No selection made, would you open Keepass2Android?")
+                                .setConfirmText("Yes")
+                                .setCancelText("Cancel")
+                                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                                    @Override
+                                    public void onClick(SweetAlertDialog sDialog) {
+                                        sDialog.dismissWithAnimation();
+                                        KeeLinkUtils.setFastFlag(getApplicationContext(),true);
+                                        openKeepass();
+                                    }
+                                })
+                                .show();
+                    } else if ("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())) {
+                        Log.d(TAG, "Opening K2PA...");
 
-                if (selected == null) {
-                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.WARNING_TYPE)
-                            .setTitleText("Hmmm not understanding...")
-                            .setContentText("No selection made, would you open Keepass2Android?")
-                            .setConfirmText("Yes")
-                            .setCancelText("Cancel")
-                            .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
-                                @Override
-                                public void onClick(SweetAlertDialog sDialog) {
-                                    sDialog.dismissWithAnimation();
-                                    KeelinkDefs.setFastFlag(getApplicationContext(),true);
-                                    openKeepass();
-                                }
-                            })
-                            .show();
-                } else if ("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())) {
-                    Log.d(TAG, "Opening K2PA...");
-                    openKeepass();
-                } else {
-                    Log.d(TAG, "Sending entry...");
-                    String title = selected.get(KeepassDefs.TitleField);
-                    String user = selected.get(KeepassDefs.UserNameField);
+                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        openKeepass();
+                    } else {
+                        Log.d(TAG, "Sending entry...");
+                        String title = selected.get(KeepassDefs.TitleField);
+                        String user = selected.get(KeepassDefs.UserNameField);
 
-                    String searchString = prepareSearchText(selected);
+                        String searchString = prepareSearchText(selected);
 
-                    openKeepassForSearch(searchString);
+                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        openKeepassForSearch(searchString);
+                    }
                 }
             }
         });
@@ -243,9 +297,11 @@ public class MainActivity extends AppCompatActivity {
     private String prepareSearchText(Map<String, String> selected) {
         String ret = "";
         String title = selected.get(KeepassDefs.TitleField).trim();
-        String user = selected.get(KeepassDefs.UserNameField).substring(KeepassDefs.UserNameField.length() + 1).trim();
+        String user = selected.get(KeelinkDefs.USERNAME_VALID_FIELD).substring(KeelinkDefs.USERNAME_VALID_FIELD.length() + 1).trim();
         /*String note = selected.get(KeepassDefs.NotesField);
         String url = selected.get(KeepassDefs.url)*/
+
+        Log.d(TAG,"Searching for -> TITLE:" + title + ", USER:" + user);
 
         if (title != null && !title.isEmpty() && !title.equals(KeelinkDefs.STR_NOT_SUPPLIED))
             ret += title.trim() + " ";
@@ -304,10 +360,30 @@ public class MainActivity extends AppCompatActivity {
         integrator.initiateScan();
     }
 
+    private void reloadList() {
+        Log.d(TAG,"Reloading list...");
+        ListView lv = (ListView) findViewById(R.id.recent_list);
+        new RecentActivityLoader(MainActivity.this,lv).execute();
+    }
+
+    private void removeSelectedEntry() {
+        SharedPreferences pref = getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE, Context.MODE_PRIVATE);
+        try {
+            JSONArray jArray = new JSONArray(pref.getString(KeelinkDefs.RECENT_PREFERENCES_ENTRY,"[]"));
+        } catch (JSONException e) { Log.e(TAG,"Not a valid selected item" + selected.toString()); }
+        String id = selected.get(KeelinkDefs.GUID_FIELD);
+        JSONObject obj = new JSONObject(selected);
+
+        Log.d(TAG,"Removing object: " + obj.toString());
+
+        new AsyncSavePreferencesTask(this,id,obj.toString(),true).execute();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult reqCode=" + requestCode + " resultCode=" + resultCode + " data=" + data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+
         if (result != null && passwordReceived != null) {
             String content = result.getContents();
 
@@ -360,4 +436,35 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.menu_list_selection, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) { return false; }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.delete_menu_entry:
+                removeSelectedEntry();
+                mActionMode.finish();
+                return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        reloadList();
+        selected = null;
+        mActionMode = null;
+    }
 }

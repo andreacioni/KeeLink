@@ -20,18 +20,10 @@ public class KeelinkDefs {
 
     public static final int MAX_RECENT_HISTORY_LENGHT = 30;
 
-    public static final String STR_NOT_SUPPLIED = "<no supplied>";
+    public static final String STR_NOT_SUPPLIED = "<not supplied>";
 
-    public static void setFastFlag(Context ctx, boolean b) {
-        SharedPreferences pref = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE,Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = pref.edit();
-        editor.putBoolean(KeelinkDefs.FLAG_FAST_SEND,b);
-        editor.commit();
-    }
+    public static final String USERNAME_VALID_FIELD = "UserNameValid";
 
-    public static boolean getFastFlag(Context ctx) {
-        SharedPreferences pref = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE,Context.MODE_PRIVATE);
-        return pref.getBoolean(KeelinkDefs.FLAG_FAST_SEND,false);
-    }
+    public static final long FAST_MILLIS_VALIDITY = 30000;
 
 }

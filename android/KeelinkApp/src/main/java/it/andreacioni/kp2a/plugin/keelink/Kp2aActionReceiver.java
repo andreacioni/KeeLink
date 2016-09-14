@@ -70,7 +70,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
 
     @Override
     public void onReceive(Context ctx, Intent intent) {
-        flagFlashSending = KeelinkDefs.getFastFlag(ctx);
+        flagFlashSending = KeeLinkUtils.getFastFlag(ctx);
         super.onReceive(ctx,intent);
     }
 }
