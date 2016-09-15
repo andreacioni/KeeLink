@@ -136,7 +136,13 @@ function initClipboardButton(password) {
 	
 	$("#copyBtn").attr("data-clipboard-text",password);
 	
-	new Clipboard('#copyBtn');
+	//Copy paassowrd to clipboard button
+	var clipCopy = new Clipboard('#copyBtn');
+	clipCopy.on('success', function() {
+		remindDelete();
+	});
+
+	//Clear clipboard button
 	new Clipboard('#clearBtn');
 
 	$("#clearBtn").click(function() { 
@@ -221,7 +227,6 @@ function onSuccess(data,textStatus,jqXhr) {
 		alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
-		remindDelete();
 	}
 }
 
