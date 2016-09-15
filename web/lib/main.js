@@ -208,7 +208,7 @@ function remindDelete() {
 		else if (Notification.permission !== 'denied') {
 			Notification.requestPermission(function (permission) {
 			if (permission === "granted") {
-				var notification = new Notification("Hi there!");
+				var notification = new Notification(REMINDER_TITLE,{"body":REMINDER_BODY});
 			}
 			});
 		}
