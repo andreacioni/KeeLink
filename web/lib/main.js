@@ -22,7 +22,7 @@ function init() {
 		requestInit();
 	}
 
-		//Enable scrolling effect on anchor clicking
+	//Enable scrolling effect on anchor clicking
 	var _root = $('html, body');
 	$('a.navbar-link').click(function(event){
 		event.preventDefault();
