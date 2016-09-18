@@ -279,8 +279,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                         openKeepass();
                     } else {
                         Log.d(TAG, "Sending entry...");
-                        String title = selected.get(KeepassDefs.TitleField);
-                        String user = selected.get(KeepassDefs.UserNameField);
 
                         String searchString = prepareSearchText(selected);
 
@@ -296,18 +294,22 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     private String prepareSearchText(Map<String, String> selected) {
         String ret = "";
-        String title = selected.get(KeepassDefs.TitleField).trim();
-        String user = selected.get(KeelinkDefs.USERNAME_VALID_FIELD).substring(KeelinkDefs.USERNAME_VALID_FIELD.length() + 1).trim();
+        String title = selected.get(KeepassDefs.TitleField);
+        String user = selected.get(KeelinkDefs.USERNAME_VALID_FIELD);
         /*String note = selected.get(KeepassDefs.NotesField);
         String url = selected.get(KeepassDefs.url)*/
 
         Log.d(TAG,"Searching for -> TITLE:" + title + ", USER:" + user);
 
-        if (title != null && !title.isEmpty() && !title.equals(KeelinkDefs.STR_NOT_SUPPLIED))
+        if (title != null && !title.isEmpty() && !title.equals(KeelinkDefs.STR_NOT_SUPPLIED)) {
+            title = title.trim();
             ret += title.trim() + " ";
+        }
 
-        if (user != null && !user.isEmpty() && !user.equals(KeelinkDefs.STR_NOT_SUPPLIED))
+        if (user != null && !user.isEmpty() && !user.equals(KeelinkDefs.STR_NOT_SUPPLIED)) {
+            user = user.substring(KeelinkDefs.USERNAME_VALID_FIELD.length() + 1).trim();
             ret += user + " ";
+        }
 
         /*if(note != null && note.substring(KeepassDefs.NotesField.length()+1).trim().isEmpty())
             ret += note.substring(KeepassDefs.NotesField.length()+1).trim() + " ";*/
