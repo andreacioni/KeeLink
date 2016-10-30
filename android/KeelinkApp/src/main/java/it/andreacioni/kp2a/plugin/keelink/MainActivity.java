@@ -267,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                                     @Override
                                     public void onClick(SweetAlertDialog sDialog) {
                                         sDialog.dismissWithAnimation();
-                                        KeeLinkUtils.setFastFlag(getApplicationContext(),true);
+                                        //KeeLinkUtils.setFastFlag(getApplicationContext(),true);
                                         openKeepass();
                                     }
                                 })
@@ -275,14 +275,14 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     } else if ("0".equals(selected.get(KeelinkDefs.GUID_FIELD).toString())) {
                         Log.d(TAG, "Opening K2PA...");
 
-                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        //KeeLinkUtils.setFastFlag(getApplicationContext(), true);
                         openKeepass();
                     } else {
                         Log.d(TAG, "Sending entry...");
 
                         String searchString = prepareSearchText(selected);
 
-                        KeeLinkUtils.setFastFlag(getApplicationContext(), true);
+                        //KeeLinkUtils.setFastFlag(getApplicationContext(), true);
                         openKeepassForSearch(searchString);
                     }
                 }

@@ -8,8 +8,8 @@ android {
         applicationId "it.andreacioni.kp2a.plugin.keelink"
         minSdkVersion 9
         targetSdkVersion 19
-        versionCode 16
-        versionName "1.0.15"
+        versionCode 17
+        versionName "1.0.16"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
