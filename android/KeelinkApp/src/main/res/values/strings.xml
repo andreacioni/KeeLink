@@ -4,6 +4,7 @@
     <string name="enable_as_plugin">Enable/Disable</string>
     <string name="about">About</string>
     <string name="howto">How to</string>
+    <string name="privacy">Privacy Policy</string>
 
     <string name="kp2aplugin_title">KeeLink Plugin</string>
     <string name="kp2aplugin_shortdesc">Send password from Keepass to other devices </string>

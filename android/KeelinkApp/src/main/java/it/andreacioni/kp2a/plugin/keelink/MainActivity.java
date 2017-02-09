@@ -205,6 +205,9 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             case R.id.about:
                 openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=credits&onlyinfo=true");
                 break;
+            case R.id.privacy:
+                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/privacy-policy.html");
+                break;
             default:
                 Log.w(TAG,"Not a valid ID");
         }

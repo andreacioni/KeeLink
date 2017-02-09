@@ -17,6 +17,8 @@
         android:title="@string/howto" />
     <item android:title="@string/about"
         android:id="@+id/about" />
+    <item android:title="@string/privacy"
+        android:id="@+id/privacy" />
 
     <item android:icon="@drawable/ic_language_white_24dp"
         android:id="@+id/go_online"
