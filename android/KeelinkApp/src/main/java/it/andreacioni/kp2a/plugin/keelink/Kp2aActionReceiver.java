@@ -42,6 +42,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
         }
 
         if(flagFlashSending) {
+            Log.d(TAG,"Flash sendig enbled");
             Intent i = new Intent(oe.getContext(), MainActivity.class);
 
             i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(oe.getEntryFields()).toString());
@@ -49,12 +50,14 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
             oe.getContext().startActivity(i);
-        }
+        } else
+            Log.d(TAG,"Flash sendig disabled");
 
     }
 
     @Override
     protected void actionSelected(ActionSelectedAction actionSelected) {
+        Log.d(TAG,"Action selected: " + actionSelected);
         Intent i = new Intent(actionSelected.getContext(), MainActivity.class);
 
         i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(actionSelected.getEntryFields()).toString());
