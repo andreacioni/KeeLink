@@ -1,7 +1,7 @@
 <?php
 session_start();
 header("Content-Type: application/json");
-
+getenv('MYSQL_SERVICE_HOST');
 //Cloudflare need this!
 if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
   $_SERVER['REMOTE_ADDR'] = $_SERVER["HTTP_CF_CONNECTING_IP"];
