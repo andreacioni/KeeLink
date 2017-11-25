@@ -17,7 +17,7 @@ var pollingInterval;
 var _query_string = parseWindowURL();
 
 function init() {
-	
+
 	if(_query_string && (_query_string.onlyinfo === true || _query_string.onlyinfo === 'true')) {
 		$("#qrplaceholder").hide();
 	} else {
@@ -75,6 +75,7 @@ function generateKeyPair() {
 
 function detectHttpProtocol() {
 	//TODO No warn, redirect!
+	$("#sidLabel").text("HTTPS protocol check...");
 	if (window.location.protocol != "https:") {
 		swal({
 			title: "Are you sure?",
