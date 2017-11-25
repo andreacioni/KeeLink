@@ -7,19 +7,21 @@ var REMINDER_DELETE_CLIPBOARD = 10000;
 var REMINDER_TITLE = "Don't forget!";
 var REMINDER_BODY = "Remember to clear your clipboard, your password is still there!";
 
+var DEFAULT_KEY_SIZE = 1024; //TODO test 2048 and persist on browser cache
+
 var _sid;
+var _crypt;
 var invalidateSid = false;
 var requestFinished = true;
 var pollingInterval;
 var _query_string = parseWindowURL();
 
 function init() {
-
+	
 	if(_query_string && (_query_string.onlyinfo === true || _query_string.onlyinfo === 'true')) {
 		$("#qrplaceholder").hide();
 	} else {
 		detectHttpProtocol();
-		requestInit();
 	}
 
 	//Enable scrolling effect on anchor clicking
@@ -40,7 +42,8 @@ function init() {
 }
 
 function requestInit() {
-	$.post("init.php",{},"json").done(
+	$("#sidLabel").text("Receiving...");
+	$.post("init.php",{PUBLIC_KEY : _crypt.getPublicKey()},"json").done(
 		function(data) {
 			if(data.status === true) {
 				_sid = data['message'];
@@ -63,19 +66,31 @@ function requestInit() {
 	);
 }
 
+function generateKeyPair() {
+	$("#sidLabel").text("Generating key pair...");
+	_crypt = new JSEncrypt({default_key_size: DEFAULT_KEY_SIZE});
+	_crypt.getKey();
+	console.log(_crypt.getPublicKey());
+}
+
 function detectHttpProtocol() {
+	//TODO No warn, redirect!
 	if (window.location.protocol != "https:") {
 		swal({
 			title: "Are you sure?",
 			text: "This connection is using HTTP protocol so is not secure, would you like to use HTTPS secure protocol?",
-			type: "warning",
-			showCancelButton: true,
-			confirmButtonText: "Go safe!",
-			cancelButtonText: "Stay here...",
-			closeOnConfirm: false
-			},
-			function(){
-			window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+			icon: "warning",
+			closeOnClickOutside:false,
+			closeOnEsc: false,
+			dangerMode: true,
+			buttons: true
+			}).then((value) => {
+				if(value) {
+					window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+				} else {
+					generateKeyPair();
+					requestInit();
+				}
 		});
 	}
 }
@@ -168,7 +183,7 @@ function alertSuccess(title,msg) {
 	swal({
 	title: title,
 	text: msg,
-	type: "success"
+	icon: "success"
 	},function() {
 		$("#copyBtn").click();
 	});
@@ -178,7 +193,7 @@ function alertInfo(title,msg) {
 	swal({
 	title: title,
 	text: msg,
-	type: "info"
+	icon: "info"
 	});
 }
 
@@ -186,7 +201,7 @@ function alertWarn(title,msg) {
 	swal({
 	title: title,
 	text: msg,
-	type: "warning"
+	icon: "warning"
 	});
 }
 
@@ -194,7 +209,7 @@ function alertError(title,msg) {
 	swal({
 	title: title,
 	text: msg,
-	type: "error"
+	icon: "error"
 	});
 }
 
@@ -223,7 +238,7 @@ function remindDelete() {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
-		initClipboardButton(data.message);
+		initClipboardButton(_crypt.decrypt(data.message));
 		alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
