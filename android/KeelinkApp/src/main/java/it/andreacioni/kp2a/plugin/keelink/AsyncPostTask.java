@@ -2,11 +2,9 @@ package it.andreacioni.kp2a.plugin.keelink;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,8 +14,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.RSAPublicKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 
-import keepass2android.pluginsdk.KeepassDefs;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SealedObject;
 
 /**
  * Created by andreacioni on 21/05/16.
@@ -44,12 +53,33 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
 
     @Override
     protected Boolean doInBackground(String... params) {
+        boolean ret = false;
         if(params == null || params.length != 3 ) {
             Log.e(this.getClass().getSimpleName(),"Invalid params passed");
-            return false;
         } else {
-            return sendThroughStd(params[0],params[1],params[2]);
+            try {
+                String encryptedKey = encryptKey(params[0], params[1], params[2]);
+                sendKey(params[0], params[1], encryptedKey);
+            } catch (IOException e) {
+                Log.e(TAG, "IO exception on connection to remote server", e);
+            } catch (NoSuchPaddingException e) {
+                Log.e(TAG, "No padding",e);
+            } catch (NoSuchAlgorithmException e) {
+                Log.e(TAG, "No encryption algorithm found",e);
+            } catch (JSONException e) {
+                Log.e(TAG, "JSON parse exception",e);
+            } catch (InvalidKeyException e) {
+                Log.e(TAG, "Supplied key not valid",e);
+            } catch (IllegalBlockSizeException e) {
+                Log.e(TAG, "Invalid block size",e);
+            } catch (BadPaddingException e) {
+                Log.e(TAG, "Bad padding",e);
+            } catch (InvalidKeySpecException e) {
+                Log.e(TAG, "Invalid key",e);
+            }
         }
+
+        return ret;
     }
 
     @Override
@@ -60,68 +90,113 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
         dialog.dismiss();
     }
 
-    private boolean sendThroughStd(String targetSite,String sid,String key) {
+    private String encryptKey(String targetSite,String sid,String key) throws IOException, NullPointerException, JSONException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+        Log.d(TAG, "Getting public key from remote");
 
-        boolean ret = false;
+        String publicKeyString = sendHTTPRequest("GET", targetSite + "getpublickey.php?sid=" + sid, null);
+        PublicKey publicKey = KeeLinkUtils.buildPublicKeyFromPEMString(publicKeyString);
+        key = KeeLinkUtils.encrypt(publicKey, key); //key is now in base64 mode
 
-        String url = targetSite + "/updatepsw.php";
+        return key;
+
+    }
+
+    private void sendKey(String targetSite,String sid,String key) throws IOException, NullPointerException, JSONException {
+        Log.d(TAG, "Sending key to remote");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("sid", sid);
+        parameters.put("key", key);
+
+        sendHTTPRequest("POST", targetSite + "updatepsw.php", parameters);
+    }
+
+    private String sendHTTPRequest(String method, String url, Map<String, String> postParameters) throws IOException, NullPointerException, JSONException {
+        Log.d(TAG, "Sending HTTP " + method + " request to: " + url + ", parameters: " + postParameters);
+        String ret = null;
+
         StringBuffer response = null;
         int responseCode = 0;
+        HttpURLConnection conn = null;
+        BufferedReader in = null;
+        DataOutputStream wr = null;
 
         try {
             URL obj = new URL(url);
-            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            conn = (HttpURLConnection) obj.openConnection();
 
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", USER_AGENT);
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setReadTimeout(10000);
-            con.setConnectTimeout(15000);
-            con.setDoInput(true);
+            conn.setRequestMethod(method);
+            conn.setRequestProperty("User-Agent", USER_AGENT);
+            conn.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            conn.setReadTimeout(10000);
+            conn.setConnectTimeout(15000);
+            conn.setDoInput(true);
 
-            String urlParameters = "sid=" + sid + "&key=" + key;
+            if(method.equals("POST") && !postParameters.isEmpty()) {
+                String urlParameters = "";
 
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
+                for(Map.Entry<String,String> e : postParameters.entrySet()) {
+                    urlParameters += e.getKey() + "=" + e.getValue() + "&";
+                }
+                urlParameters = urlParameters.substring(0, urlParameters.length()-1); //last "&" is not needed
 
-            responseCode = con.getResponseCode();
+                Log.d(TAG, "Sending POST request parameters");
+                conn.setDoOutput(true);
+                wr = new DataOutputStream(conn.getOutputStream());
+                wr.writeBytes(urlParameters);
+                wr.flush();
+                wr.close();
+                wr = null;
+            }
 
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+            Log.d(TAG, "Looking for HTTP response");
+
+            responseCode = conn.getResponseCode();
+
+            Log.d(TAG, "HTTP response code: " + responseCode);
+
+            in = new BufferedReader(
+                    new InputStreamReader(conn.getInputStream()));
             String inputLine;
             response = new StringBuffer();
 
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
             }
+
             in.close();
+
+            in = null;
+            conn = null;
         } catch (IOException e) {
-            Log.e(TAG, "General IO exception:" + e.getMessage());
+            throw e;
+        } finally {
+            if(wr != null)
+                wr.close();
+            if(in != null)
+                in.close();
+            if(conn != null)
+                conn.disconnect();
+
         }
 
-
-        if(response == null) {
-            Log.e(TAG, "Null response received");
+        if (response == null) {
+            throw new NullPointerException("Null response received");
         } else {
             Log.d(TAG, "Response code: " + responseCode + " Response: " + response.toString());
 
-            if(responseCode == 200) {
-                try {
-                    JSONObject jObj  = new JSONObject(response.toString());
-                    Log.d(TAG,jObj.toString());
-                    Boolean b = jObj.getBoolean("status");
-                    ret = (b!=null) && b;
-                } catch (JSONException e) {
-                    Log.e(TAG,"JSON parsing exception: " + e.getMessage());
-                }
+            if (responseCode == 200) {
+                JSONObject jObj = new JSONObject(response.toString());
+                Log.d(TAG, jObj.toString());
+                Boolean b = jObj.getBoolean("status");
+                if(!b)
+                    throw new IllegalStateException("Response status is false");
 
+            } else {
+                Log.w(TAG, "Something wrong in HTTP request. (" + responseCode + ")");
             }
         }
 
         return ret;
     }
-
 }
