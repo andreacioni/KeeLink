@@ -2,6 +2,6 @@
 	require('keelink.php');
 	$sid = $_GET["sid"];
 	
-	echo KeeLink::getPasswordForSid($sid);
+	echo KeeLink::getPublicKeyForSid($sid);
 
 ?>

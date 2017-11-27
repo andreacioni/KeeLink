@@ -116,6 +116,32 @@ class KeeLink {
         
         return json_encode($jresp);
     }
+
+    static public function getPublicKeyForSid($sid) {
+        $jresp['status'] = FALSE;
+        
+        if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
+            $jresp['message'] = "Invalid parameter passed (1)";
+        } else {
+            $conn = KeeLink::getConnection();
+            
+            $sql = "select PUBLIC_KEY from KEEPASS where SESSION_ID='".$sid."'";
+            $result = $conn->query($sql);
+            
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                
+                $jresp['message'] = $row['PUBLIC_KEY'];
+                $jresp['status'] = TRUE;
+            } else {
+                $jresp['message'] = "Error fetching public key (4)";
+            }
+
+            $conn->close();	
+        }
+        
+        return json_encode($jresp);
+    }
     
     static private function needChapta($conn) {
         $sqlAccessAttempt = "select SID_CREATED from USER where USER_ID='".$_SERVER['REMOTE_ADDR']."'";

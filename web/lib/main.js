@@ -239,7 +239,7 @@ function remindDelete() {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
-		initClipboardButton(_crypt.decrypt(data.message));
+		initClipboardButton(_crypt.decrypt(window.btoa(data.message)));
 		alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
 		$.post("removeentry.php",{'sid':_sid},function(){},"json");
 		invalidateSession();
