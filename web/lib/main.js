@@ -1,5 +1,6 @@
 $(init);
 
+
 var INVALIDATE_TIMEOUT_SEC = 50;
 var REQUEST_INTERVAL = 2000;
 
@@ -17,7 +18,6 @@ var pollingInterval;
 var _query_string = parseWindowURL();
 
 function init() {
-
 	if(_query_string && (_query_string.onlyinfo === true || _query_string.onlyinfo === 'true')) {
 		$("#qrplaceholder").hide();
 	} else {
@@ -43,9 +43,9 @@ function init() {
 
 function requestInit() {
 	$("#sidLabel").text("Receiving...");
-	console.log(PEMtoBase64String(_crypt.getPublicKey()));
-	console.log(toSafeBase64(PEMtoBase64String(_crypt.getPublicKey())))
-	$.post("init.php",{PUBLIC_KEY : toSafeBase64(PEMtoBase64String(_crypt.getPublicKey()))},"json").done(
+	console.log(PEMtoBase64(_crypt.getPublicKey()));
+	console.log(toSafeBase64(PEMtoBase64(_crypt.getPublicKey())))
+	$.post("init.php",{PUBLIC_KEY : toSafeBase64(PEMtoBase64(_crypt.getPublicKey()))},"json").done(
 		function(data) {
 			if(data.status === true) {
 				_sid = data['message'];
@@ -73,7 +73,6 @@ function generateKeyPair() {
 	_crypt = new JSEncrypt({default_key_size: DEFAULT_KEY_SIZE});
 	_crypt.getKey();
 	console.log(_crypt.getPublicKey());
-	console.log(_crypt.getPrivateKey());
 }
 
 function detectHttpProtocol() {
@@ -153,10 +152,10 @@ function initClipboardButton(password) {
 		}
 	);
 	
-	$("#copyBtn").attr("data-clipboard-text",password);
+	$("#copyBtn,.swal-button").attr("data-clipboard-text",password);
 	
 	//Copy paassowrd to clipboard button
-	var clipCopy = new Clipboard('#copyBtn');
+	var clipCopy = new Clipboard('#copyBtn,.swal-button');
 	clipCopy.on('success', function() {
 		remindDelete();
 	});
@@ -188,7 +187,7 @@ function alertSuccess(title,msg) {
 	title: title,
 	text: msg,
 	icon: "success"
-	}).then(() => {$("#copyBtn").click();});
+	});
 }
 
 function alertInfo(title,msg) {
@@ -246,8 +245,8 @@ function onSuccess(data,textStatus,jqXhr) {
 		decryptedPsw = _crypt.decrypt(data.message);
 		if(decryptedPsw) {
 			console.log("Decrypted password: " + decryptedPsw);
-			initClipboardButton(decryptedPsw);
 			alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
+			initClipboardButton(decryptedPsw);
 			$.post("removeentry.php",{'sid':_sid},function(){},"json");
 			invalidateSession();
 		} else {
@@ -270,7 +269,7 @@ function invalidateSession() {
 	$("#qrcode").css("-webkit-filter", "blur(2px)");
 }
 
-function PEMtoBase64String(pem) {
+function PEMtoBase64(pem) {
 	return pem.replace(new RegExp("\\n","g"), "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
 }
 
