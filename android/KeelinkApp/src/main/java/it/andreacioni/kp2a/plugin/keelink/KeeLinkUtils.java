@@ -10,11 +10,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
@@ -72,14 +74,14 @@ public class KeeLinkUtils {
     public static String hideUsernameString(String username) {
         String clone = new String(username);
         char us[] = username.toCharArray();
-        if (username.length() >5) {
-            for (int i=2;i<username.length()-2;i++){
-                us[i]= '*';
+        if (username.length() > 5) {
+            for (int i = 2; i < username.length() - 2; i++) {
+                us[i] = '*';
                 clone = new String(us);
             }
-        } else{
-            for (int i=1;i<username.length();i++){
-                us[i]= '*';
+        } else {
+            for (int i = 1; i < username.length(); i++) {
+                us[i] = '*';
                 clone = new String(us);
 
             }
@@ -88,30 +90,21 @@ public class KeeLinkUtils {
         return clone;
     }
 
-    public static String PEMtoBase64String(String key) {
-        return key.replace("-----BEGIN PUBLIC KEY-----\n", "").replace("-----END PUBLIC KEY-----", "").replaceAll("\n", "");
-    }
-
-    public static PublicKey buildPublicKeyFromPEMString(String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        key = PEMtoBase64String(key);
-        return buildPublicKeyFromBase64String(key);
-    }
-
-    public static PublicKey buildPublicKeyFromBase64String(String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
-        byte[] byteKey = Base64.decode(key.getBytes(), Base64.DEFAULT);
+    public static RSAPublicKey buildPublicKeyFromBase64String(String key) throws InvalidKeySpecException, NoSuchAlgorithmException {
+        byte[] byteKey = Base64.decode(key.getBytes(), Base64.NO_WRAP | Base64.URL_SAFE);
         X509EncodedKeySpec X509publicKey = new X509EncodedKeySpec(byteKey);
         KeyFactory kf = KeyFactory.getInstance("RSA");
 
-        return kf.generatePublic(X509publicKey);
+        return (RSAPublicKey) kf.generatePublic(X509publicKey);
     }
 
-    public static String encrypt(PublicKey publicKey, String plainTextKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public static String encrypt(PublicKey publicKey, String plainTextKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
         byte[] plainTextByte = plainTextKey.getBytes();
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] encryptedByte = cipher.doFinal(plainTextByte);
 
-        String encryptedText = Base64.encodeToString(encryptedByte, Base64.URL_SAFE);
+        String encryptedText = Base64.encodeToString(encryptedByte, Base64.NO_WRAP | Base64.URL_SAFE);
 
         return encryptedText;
     }

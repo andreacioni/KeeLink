@@ -60,6 +60,7 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
             try {
                 String encryptedKey = encryptKey(params[0], params[1], params[2]);
                 sendKey(params[0], params[1], encryptedKey);
+                ret = true;
             } catch (IOException e) {
                 Log.e(TAG, "IO exception on connection to remote server", e);
             } catch (NoSuchPaddingException e) {
@@ -93,8 +94,9 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
     private String encryptKey(String targetSite,String sid,String key) throws IOException, NullPointerException, JSONException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         Log.d(TAG, "Getting public key from remote");
 
-        String publicKeyString = sendHTTPRequest("GET", targetSite + "getpublickey.php?sid=" + sid, null);
-        PublicKey publicKey = KeeLinkUtils.buildPublicKeyFromPEMString(publicKeyString);
+        String publicKeyString = sendHTTPRequest("GET", targetSite + "/getpublickey.php?sid=" + sid, null);
+        PublicKey publicKey = KeeLinkUtils.buildPublicKeyFromBase64String(publicKeyString);
+        Log.d(TAG, publicKey.toString());
         key = KeeLinkUtils.encrypt(publicKey, key); //key is now in base64 mode
 
         return key;
@@ -108,7 +110,7 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
         parameters.put("sid", sid);
         parameters.put("key", key);
 
-        sendHTTPRequest("POST", targetSite + "updatepsw.php", parameters);
+        sendHTTPRequest("POST", targetSite + "/updatepsw.php", parameters);
     }
 
     private String sendHTTPRequest(String method, String url, Map<String, String> postParameters) throws IOException, NullPointerException, JSONException {
@@ -183,14 +185,16 @@ class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
         if (response == null) {
             throw new NullPointerException("Null response received");
         } else {
-            Log.d(TAG, "Response code: " + responseCode + " Response: " + response.toString());
-
             if (responseCode == 200) {
+                Log.d(TAG, "Response: " + response.toString());
+
                 JSONObject jObj = new JSONObject(response.toString());
                 Log.d(TAG, jObj.toString());
                 Boolean b = jObj.getBoolean("status");
                 if(!b)
                     throw new IllegalStateException("Response status is false");
+                else
+                    ret = jObj.getString("message");
 
             } else {
                 Log.w(TAG, "Something wrong in HTTP request. (" + responseCode + ")");

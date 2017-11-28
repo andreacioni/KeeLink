@@ -43,7 +43,9 @@ function init() {
 
 function requestInit() {
 	$("#sidLabel").text("Receiving...");
-	$.post("init.php",{PUBLIC_KEY : _crypt.getPublicKey()},"json").done(
+	console.log(PEMtoBase64String(_crypt.getPublicKey()));
+	console.log(toSafeBase64(PEMtoBase64String(_crypt.getPublicKey())))
+	$.post("init.php",{PUBLIC_KEY : toSafeBase64(PEMtoBase64String(_crypt.getPublicKey()))},"json").done(
 		function(data) {
 			if(data.status === true) {
 				_sid = data['message'];
@@ -71,6 +73,7 @@ function generateKeyPair() {
 	_crypt = new JSEncrypt({default_key_size: DEFAULT_KEY_SIZE});
 	_crypt.getKey();
 	console.log(_crypt.getPublicKey());
+	console.log(_crypt.getPrivateKey());
 }
 
 function detectHttpProtocol() {
@@ -131,7 +134,7 @@ function passwordLooker() {
 	if(!invalidateSid) {
 		if(requestFinished) {
 			requestFinished = false;
-			$.post("getpassforsid.php",{'sid':_sid},onSuccess,"json").always(function() {requestFinished = true;});
+			$.get("getpassforsid.php",{'sid':_sid},onSuccess,"json").always(function() {requestFinished = true;});
 		}
 	} else {
 		invalidateSession(); 
@@ -185,9 +188,7 @@ function alertSuccess(title,msg) {
 	title: title,
 	text: msg,
 	icon: "success"
-	},function() {
-		$("#copyBtn").click();
-	});
+	}).then(() => {$("#copyBtn").click();});
 }
 
 function alertInfo(title,msg) {
@@ -239,10 +240,20 @@ function remindDelete() {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
-		initClipboardButton(_crypt.decrypt(window.btoa(data.message)));
-		alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
-		$.post("removeentry.php",{'sid':_sid},function(){},"json");
-		invalidateSession();
+		console.log("Encoded password: " + data.message);
+		data.message = fromSafeBase64(data.message);
+		console.log("Decoded password: " + data.message);
+		decryptedPsw = _crypt.decrypt(data.message);
+		if(decryptedPsw) {
+			console.log("Decrypted password: " + decryptedPsw);
+			initClipboardButton(decryptedPsw);
+			alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
+			$.post("removeentry.php",{'sid':_sid},function(){},"json");
+			invalidateSession();
+		} else {
+			alertError("Error", "There was an error, can't decrypt your password. Try again...");
+			invalidateSession();
+		}
 	}
 }
 
@@ -257,4 +268,16 @@ function invalidateSession() {
 	$("#sidLabel").css("text-decoration", "line-through");
 	$("#qrcode").css("filter", "blur(2px)");
 	$("#qrcode").css("-webkit-filter", "blur(2px)");
+}
+
+function PEMtoBase64String(pem) {
+	return pem.replace(new RegExp("\\n","g"), "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
+}
+
+function toSafeBase64(notSafe) {
+	return notSafe.replace(new RegExp("\\n","g"), "").replace(new RegExp("\\+","g"),"-").replace(new RegExp("\/","g"), "_");
+}
+
+function fromSafeBase64(safe) {
+	return safe.replace(new RegExp("\\n","g"), "").replace(new RegExp("-","g"),"+").replace(new RegExp("_","g"), "/");
 }

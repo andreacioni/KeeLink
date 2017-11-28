@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 
 public class KeelinkDefs {
 
-    public static final String TARGET_SITE = "https://keelink.cloud";
+    public static final String TARGET_SITE = "http://andysite.altervista.org/keepass";
 
     public static final String RECENT_PREFERENCES_ENTRY = "recentHistory";
     public static final String FLAG_FAST_SEND= "fastSend";
