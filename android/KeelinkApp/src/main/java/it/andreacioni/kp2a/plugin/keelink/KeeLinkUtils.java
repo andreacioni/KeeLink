@@ -100,7 +100,7 @@ public class KeeLinkUtils {
 
     public static String encrypt(PublicKey publicKey, String plainTextKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException {
         byte[] plainTextByte = plainTextKey.getBytes();
-        Cipher cipher = Cipher.getInstance("RSA");
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
         byte[] encryptedByte = cipher.doFinal(plainTextByte);
 
