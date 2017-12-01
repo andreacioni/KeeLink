@@ -79,22 +79,10 @@ function detectHttpProtocol() {
 	//TODO No warn, redirect!
 	$("#sidLabel").text("HTTPS protocol check...");
 	if (window.location.protocol != "https:") {
-		swal({
-			title: "Are you sure?",
-			text: "This connection is using HTTP protocol so is not secure, would you like to use HTTPS secure protocol?",
-			icon: "warning",
-			closeOnClickOutside:false,
-			closeOnEsc: false,
-			dangerMode: true,
-			buttons: true
-			}).then((value) => {
-				if(value) {
-					window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
-				} else {
-					generateKeyPair();
-					requestInit();
-				}
-		});
+		window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
+	} else {
+		generateKeyPair();
+		requestInit();
 	}
 }
 
