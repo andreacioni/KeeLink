@@ -1,5 +1,6 @@
 $(init);
 
+var DEBUG = false;
 
 var INVALIDATE_TIMEOUT_SEC = 50;
 var REQUEST_INTERVAL = 2000;
@@ -43,8 +44,8 @@ function init() {
 
 function requestInit() {
 	$("#sidLabel").text("Receiving...");
-	console.log(PEMtoBase64(_crypt.getPublicKey()));
-	console.log(toSafeBase64(PEMtoBase64(_crypt.getPublicKey())))
+	log(PEMtoBase64(_crypt.getPublicKey()));
+	log(toSafeBase64(PEMtoBase64(_crypt.getPublicKey())))
 	$.post("init.php",{PUBLIC_KEY : toSafeBase64(PEMtoBase64(_crypt.getPublicKey()))},"json").done(
 		function(data) {
 			if(data.status === true) {
@@ -72,7 +73,7 @@ function generateKeyPair() {
 	$("#sidLabel").text("Generating key pair...");
 	_crypt = new JSEncrypt({default_key_size: DEFAULT_KEY_SIZE});
 	_crypt.getKey();
-	console.log(_crypt.getPublicKey());
+	log(_crypt.getPublicKey());
 }
 
 function detectHttpProtocol() {
@@ -227,12 +228,12 @@ function remindDelete() {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
-		console.log("Encoded password: " + data.message);
+		log("Encoded password: " + data.message);
 		data.message = fromSafeBase64(data.message);
-		console.log("Decoded password: " + data.message);
+		log("Decoded password: " + data.message);
 		decryptedPsw = _crypt.decrypt(data.message);
 		if(decryptedPsw) {
-			console.log("Decrypted password: " + decryptedPsw);
+			log("Decrypted password: " + decryptedPsw);
 			alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
 			initClipboardButton(decryptedPsw);
 			$.post("removeentry.php",{'sid':_sid},function(){},"json");
@@ -267,4 +268,9 @@ function toSafeBase64(notSafe) {
 
 function fromSafeBase64(safe) {
 	return safe.replace(new RegExp("\\n","g"), "").replace(new RegExp("-","g"),"+").replace(new RegExp("_","g"), "/");
+}
+
+function log(str) {
+	if(DEBUG)
+		console.log(str);
 }
