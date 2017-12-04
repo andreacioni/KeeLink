@@ -21,7 +21,6 @@
   <link rel="stylesheet" href="css/normalize.css">
   <link rel="stylesheet" href="css/skeleton.css">
   <link rel="stylesheet" href="css/custom.css">
-  <link rel="stylesheet" href="css/sweetalert.css">
   <link rel="stylesheet" href="css/pace.css">
   <link rel="stylesheet" href="css/font-awesome.min.css">
 
@@ -30,7 +29,7 @@
   <link rel="icon" type="image/ico" href="images/favicon.ico">
   
   <!-- JS LIBARY -->
-  <script type="text/javascript" src="lib/pace/pace.js"></script>
+  <script type="text/javascript" src="lib/pace/pace.js" data-pace-options='{ "ajax": false }'></script>
   <script type="text/javascript" src="lib/jsencrypt/jsencrypt.min.js"></script>
   <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
   <script type="text/javascript" src="lib/qrcode/qrcode.min.js"></script>
@@ -139,11 +138,11 @@
 					<li>The Android one<ul>
 						<li>
 							KeeLink Android application acts as a bridge from Keepass2Android to this web page. Every password is retrieved
-							from the Keepass Database. Once the password is received, the application waits for the user to scan QR code 
+							from the Keepass Database (KDBX). Once the password is received, the application waits for the user to scan QR code 
 							with its device camera. QR Code contains a simple URL as <i>ksid://yourpersonalanduniquesessionid</i>, so when the QR code 
-							is correctly parsed, the password is sent to a database and associated with <i>'yourpersonalanduniquesessionid'</i>. <b>No other information are sent 
+							is correctly parsed, the password is, firstly, encrypted with an <b>RSA 1024 bit</b> public key and then sent to a database and associated with <i>'yourpersonalanduniquesessionid'</i>. <b>No other information are sent 
 							over network</b>, <b>that is important for you</b> because it is essential for me to mantain your password as safe as possible. 
-							More security for your password was added by the <b>HTTPS/SSL</b> protocol that is used for real transmit from Android to World Wide Web.
+							More security for your password was added by the <b>HTTPS/SSL</b> protocol that is used for real transmission from your Android device to this site.
 						</li>
 					</ul></li>
 					<li>The PHP one<ul>
