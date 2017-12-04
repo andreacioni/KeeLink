@@ -15,32 +15,41 @@ class KeeLink {
     static public function initNewSession() {
         
         $jresp['status'] = false;
+
+        $publickey = $_POST['PUBLIC_KEY'];
         
         $sid = KeeLink::generateSid();
         
-        $conn = KeeLink::getConnection();
+        $inputok = KeeLink::validateBase64Input($publickey);
         
         $jresp['chaptaRequired'] = FALSE;//TODO KeeLink::needChapta($conn);
 
-        if($jresp['chaptaRequired'] === TRUE) {
-            $jresp['message'] = "Error(4): Chapta required";
-        } else {
-            $sqlInserUser = "INSERT INTO `USER`(`USER_ID`) VALUES ('" . $_SERVER['REMOTE_ADDR'] . "') ON DUPLICATE KEY UPDATE USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
-            $sqlInsertSID = "INSERT INTO `KEEPASS`(`SESSION_ID`,`USER_ID`,`PUBLIC_KEY`) VALUES ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."','". $_POST['PUBLIC_KEY'] ."') ON DUPLICATE KEY UPDATE PUBLIC_KEY='".$_POST['PUBLIC_KEY']."'"; //TODO fix possible SQL injection
+        if($inputok === TRUE) {
+            $conn = KeeLink::getConnection();
             
-            if ($conn->query($sqlInserUser) === TRUE) {
-                if ($conn->query($sqlInsertSID) === TRUE) {
-                    $jresp['status'] = TRUE;
-                    $jresp['message'] = $sid;
-                } else {
-                    $jresp['message'] = "Error(2): " . $conn->error;
-                }
+            if($jresp['chaptaRequired'] === TRUE) {
+                $jresp['message'] = "Error(4): Chapta required";
             } else {
-                $jresp['message'] = "Error(3): " . $conn->error;
+                $sqlInserUser = "insert into `USER`(USER_ID) values ('" . $_SERVER['REMOTE_ADDR'] . "') on duplicate key update USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
+                $sqlInsertSID = "insert into KEEPASS(SESSION_ID,USER_ID,PUBLIC_KEY) values ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."','". $publickey ."') on duplicate key update PUBLIC_KEY='".$publickey."'"; //TODO fix possible SQL injection
+                
+                if ($conn->query($sqlInserUser) === TRUE) {
+                    if ($conn->query($sqlInsertSID) === TRUE) {
+                        $jresp['status'] = TRUE;
+                        $jresp['message'] = $sid;
+                    } else {
+                        $jresp['message'] = "Error(2): " . $conn->error;
+                    }
+                } else {
+                    $jresp['message'] = "Error(3): " . $conn->error;
+                }
             }
+    
+            $conn->close();
+        } else {
+            $jresp['message'] = "Error(1): Invalid public key received";
         }
-
-		$conn->close();
+        
         return json_encode($jresp);
     }
     
@@ -52,7 +61,7 @@ class KeeLink {
         } else {
             $conn = KeeLink::getConnection();
             
-            $sql = "SELECT PSW FROM KEEPASS WHERE SESSION_ID='".$sid."' and PSW is not null";
+            $sql = "select PSW from KEEPASS where SESSION_ID='".$sid."' and PSW is not null";
             $result = $conn->query($sql);
             
             if ($result->num_rows > 0) {
@@ -79,7 +88,7 @@ class KeeLink {
         } else {
             $conn = KeeLink::getConnection();
             
-            $sql = "DELETE FROM KEEPASS WHERE SESSION_ID='".$sid."'";
+            $sql = "delete from KEEPASS where SESSION_ID='".$sid."'";
             
             if ($conn->query($sql) === TRUE) {
                 $jresp['message'] = "OK";
@@ -102,7 +111,7 @@ class KeeLink {
         } else {
             $conn = KeeLink::getConnection();
             
-            $sql = "UPDATE KEEPASS set PSW ='".$psw."' where SESSION_ID='".$sid."' and PSW is null";
+            $sql = "update KEEPASS set PSW ='".$psw."' where SESSION_ID='".$sid."' and PSW is null";
             
             if (($conn->query($sql) === TRUE) && ($conn->affected_rows == 1)) {
                 $jresp['message'] = "OK";
@@ -142,6 +151,18 @@ class KeeLink {
         
         return json_encode($jresp);
     }
+
+    static public function removeOldSids() {
+        $jresp['status'] = TRUE;
+
+        $conn = KeeLink::getConnection();
+        $sql = "delete from KEEPASS where PSW is not null";
+        $result = $conn->query($sql);
+
+        $jresp['message'] = "Removed ".$conn->affected_rows." old record/s";
+
+        return json_encode($jresp);
+    }
     
     static private function needChapta($conn) {
         $sqlAccessAttempt = "select SID_CREATED from USER where USER_ID='".$_SERVER['REMOTE_ADDR']."'";
@@ -160,6 +181,18 @@ class KeeLink {
             $_SESSION["generatedSid"] = hash("md5",openssl_random_pseudo_bytes(256));
         
         return $_SESSION["generatedSid"];
+    }
+
+    static private function validatePublicKey($publickey) { //TODO
+        return validateBase64Input($publickey);
+    }
+
+    static private function validateSid($sid) { //TODO
+        return TRUE;
+    }
+
+    static private function validateBase64Input($str) { //TODO
+        return TRUE;
     }
     
     static private function getConnection() {
