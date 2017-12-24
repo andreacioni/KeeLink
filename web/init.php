@@ -1,5 +1,6 @@
 <?php 
     require('keelink.php');
-	
-	echo KeeLink::initNewSession();
+    $publickey = $_POST['PUBLIC_KEY'];
+
+	echo KeeLink::initNewSession($publickey);
 ?>

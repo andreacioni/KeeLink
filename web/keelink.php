@@ -12,11 +12,9 @@ if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
 
 class KeeLink {
     
-    static public function initNewSession() {
+    static public function initNewSession($publickey) {
         
         $jresp['status'] = false;
-
-        $publickey = $_POST['PUBLIC_KEY'];
         
         $sid = KeeLink::generateSid();
         
@@ -31,17 +29,17 @@ class KeeLink {
                 $jresp['message'] = "Error(4): Chapta required";
             } else {
                 $sqlInserUser = "insert into `USER`(USER_ID) values ('" . $_SERVER['REMOTE_ADDR'] . "') on duplicate key update USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
-                $sqlInsertSID = "insert into KEEPASS(SESSION_ID,USER_ID,PUBLIC_KEY) values ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."','". $publickey ."') on duplicate key update PUBLIC_KEY='".$publickey."'"; //TODO fix possible SQL injection
+                $sqlInsertSID = "insert into KEEPASS(SESSION_ID,USER_ID,PUBLIC_KEY) values ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."','". $publickey ."') on duplicate key update PUBLIC_KEY='".$publickey."'";
                 
                 if ($conn->query($sqlInserUser) === TRUE) {
                     if ($conn->query($sqlInsertSID) === TRUE) {
                         $jresp['status'] = TRUE;
                         $jresp['message'] = $sid;
                     } else {
-                        $jresp['message'] = "Error(2): " . $conn->error;
+                        $jresp['message'] = "Error(2): ".mysqli_error($conn);
                     }
                 } else {
-                    $jresp['message'] = "Error(3): " . $conn->error;
+                    $jresp['message'] = "Error(3): ".mysqli_error($conn);
                 }
             }
     
@@ -133,7 +131,7 @@ class KeeLink {
                     $jresp['message'] = "OK";
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "SQL Error (6): " . $conn->error;
+                    $jresp['message'] = "SQL Error (6): ".mysqli_error($conn);
                 }
     
                 $conn->close();
@@ -226,7 +224,7 @@ class KeeLink {
             die;
         }
         
-        $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: " . mysqli_error($conn));
+        $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: ".mysqli_error($conn));
         $conn->set_charset("utf8");
         
         return $conn;
