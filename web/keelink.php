@@ -24,7 +24,7 @@ class KeeLink {
         
         $jresp['chaptaRequired'] = FALSE;//TODO KeeLink::needChapta($conn);
 
-        if($inputok === TRUE) {
+        if($inputok) {
             $conn = KeeLink::getConnection();
             
             if($jresp['chaptaRequired'] === TRUE) {
@@ -56,26 +56,33 @@ class KeeLink {
     static public function getPasswordForSid($sid) {
         $jresp['status'] = FALSE;
         
-        if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-            $jresp['message'] = "Invalid parameter passed (1)";
-        } else {
-            $conn = KeeLink::getConnection();
-            
-            $sql = "select PSW from KEEPASS where SESSION_ID='".$sid."' and PSW is not null";
-            $result = $conn->query($sql);
-            
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                $_SESSION["generatedSid"] = NULL;
-                
-                $jresp['message'] = $row['PSW'];
-                $jresp['status'] = TRUE;
-            } else {
-                $jresp['message'] = "Error fetching password (4)";
-            }
+        $inputok = KeeLink::validateMD5($sid);
 
-            $conn->close();	
+        if($inputok) {
+            if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
+                $jresp['message'] = "Invalid parameter passed (2)";
+            } else {
+                $conn = KeeLink::getConnection();
+                
+                $sql = "select PSW from KEEPASS where SESSION_ID='".$sid."' and PSW is not null";
+                $result = $conn->query($sql);
+                
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();
+                    $_SESSION["generatedSid"] = NULL;
+                    
+                    $jresp['message'] = $row['PSW'];
+                    $jresp['status'] = TRUE;
+                } else {
+                    $jresp['message'] = "Error fetching password (4)";
+                }
+    
+                $conn->close();	
+            }
+        } else {
+            $jresp['message'] = "Invalid sid passed (1)";
         }
+        
         
         return json_encode($jresp);
     }
@@ -83,21 +90,27 @@ class KeeLink {
     static public function removeEntry($sid) {
         $jresp['status'] = FALSE;
         
-        if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-            $jresp['message'] = "Invalid parameter passed (7)";
-        } else {
-            $conn = KeeLink::getConnection();
-            
-            $sql = "delete from KEEPASS where SESSION_ID='".$sid."'";
-            
-            if ($conn->query($sql) === TRUE) {
-                $jresp['message'] = "OK";
-                $jresp['status'] = TRUE;
-            } else {
-                $jresp['message'] = "Error fetching password (8)";
-            }
+        $inputok = KeeLink::validateMD5($sid);
 
-            $conn->close();	
+        if($inputok) {
+            if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
+                $jresp['message'] = "Invalid parameter passed (7)";
+            } else {
+                $conn = KeeLink::getConnection();
+                
+                $sql = "delete from KEEPASS where SESSION_ID='".$sid."'";
+                
+                if ($conn->query($sql) === TRUE) {
+                    $jresp['message'] = "OK";
+                    $jresp['status'] = TRUE;
+                } else {
+                    $jresp['message'] = "Error fetching password (8)";
+                }
+    
+                $conn->close();	
+            }
+        } else {
+            $jresp['message'] = "Invalid sid passed (1)";
         }
         
         return json_encode($jresp);
@@ -106,21 +119,27 @@ class KeeLink {
     static public function setPasswordForSid($sid,$psw) {
         $jresp['status'] = FALSE;
         
-        if($sid === NULL || $psw === NULL) {
-            $jresp['message'] = "Invalid parameter passed (5)";
-        } else {
-            $conn = KeeLink::getConnection();
-            
-            $sql = "update KEEPASS set PSW ='".$psw."' where SESSION_ID='".$sid."' and PSW is null";
-            
-            if (($conn->query($sql) === TRUE) && ($conn->affected_rows == 1)) {
-                $jresp['message'] = "OK";
-                $jresp['status'] = TRUE;
-            } else {
-                $jresp['message'] = "SQL Error (6): " . $conn->error;
-            }
+        $inputok = KeeLink::validateMD5($sid);
 
-            $conn->close();
+        if($inputok) {
+            if($sid === NULL || $psw === NULL) {
+                $jresp['message'] = "Invalid parameter passed (5)";
+            } else {
+                $conn = KeeLink::getConnection();
+                
+                $sql = "update KEEPASS set PSW ='".$psw."' where SESSION_ID='".$sid."' and PSW is null";
+                
+                if (($conn->query($sql) === TRUE) && ($conn->affected_rows == 1)) {
+                    $jresp['message'] = "OK";
+                    $jresp['status'] = TRUE;
+                } else {
+                    $jresp['message'] = "SQL Error (6): " . $conn->error;
+                }
+    
+                $conn->close();
+            }
+        } else {
+            $jresp['message'] = "Invalid sid passed (1)";
         }
         
         return json_encode($jresp);
@@ -129,25 +148,32 @@ class KeeLink {
     static public function getPublicKeyForSid($sid) {
         $jresp['status'] = FALSE;
         
-        if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-            $jresp['message'] = "Invalid parameter passed (1)";
-        } else {
-            $conn = KeeLink::getConnection();
-            
-            $sql = "select PUBLIC_KEY from KEEPASS where SESSION_ID='".$sid."'";
-            $result = $conn->query($sql);
-            
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                
-                $jresp['message'] = $row['PUBLIC_KEY'];
-                $jresp['status'] = TRUE;
-            } else {
-                $jresp['message'] = "Error fetching public key (4)";
-            }
+        $inputok = KeeLink::validateMD5($sid);
 
-            $conn->close();	
+        if($inputok) {
+            if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
+                $jresp['message'] = "Invalid parameter passed (2)";
+            } else {
+                $conn = KeeLink::getConnection();
+                
+                $sql = "select PUBLIC_KEY from KEEPASS where SESSION_ID='".$sid."'";
+                $result = $conn->query($sql);
+                
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();
+                    
+                    $jresp['message'] = $row['PUBLIC_KEY'];
+                    $jresp['status'] = TRUE;
+                } else {
+                    $jresp['message'] = "Error fetching public key (4)";
+                }
+    
+                $conn->close();	
+            }
+        } else {
+            $jresp['message'] = "Invalid sid passed (1)";
         }
+        
         
         return json_encode($jresp);
     }
@@ -183,16 +209,12 @@ class KeeLink {
         return $_SESSION["generatedSid"];
     }
 
-    static private function validatePublicKey($publickey) { //TODO
-        return validateBase64Input($publickey);
+    static private function validateBase64Input($str) { 
+        return preg_match("/^[A-Za-z0-9-_]*={0,4}$/", $str) === 1;
     }
 
-    static private function validateSid($sid) { //TODO
-        return TRUE;
-    }
-
-    static private function validateBase64Input($str) { //TODO
-        return TRUE;
+    static private function validateMD5($str) {
+        return (preg_match("/^[A-Za-z0-9]{32}$/", $str) === 1);
     }
     
     static private function getConnection() {
@@ -200,11 +222,8 @@ class KeeLink {
         $CONFIG_INI = parse_ini_file('private/config.ini');
         
         if($CONFIG_INI == FALSE) {
-            $CONFIG_INI['host'] = getenv('MYSQL_SERVICE_HOST');
-            $CONFIG_INI['username'] = getenv('MYSQL_USER');
-            $CONFIG_INI['password'] = getenv('MYSQL_PASSWORD');
-            $CONFIG_INI['dbname'] = "keelink";
-            $CONFIG_INI['port'] = getenv('MYSQL_SERVICE_PORT');
+            error_log("Configuration file not found");
+            die;
         }
         
         $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: " . mysqli_error($conn));
