@@ -127,7 +127,7 @@ class KeeLink {
             } else {
                 $conn = KeeLink::getConnection();
                 
-                $sql = "update KEEPASS set PSW ='".$psw."' where SESSION_ID='".$sid."' and PSW is null";
+                $sql = "update KEEPASS set PSW ='".$conn->real_escape_string($psw)."' where SESSION_ID='".$sid."' and PSW is null";
                 
                 if (($conn->query($sql) === TRUE) && ($conn->affected_rows == 1)) {
                     $jresp['message'] = "OK";
@@ -227,6 +227,8 @@ class KeeLink {
         }
         
         $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: " . mysqli_error($conn));
+        $conn->set_charset("utf8");
+        
         return $conn;
     }
 
