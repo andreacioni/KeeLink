@@ -21,7 +21,7 @@
     <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" tools:replace="android:icon,android:theme"
         android:label="@string/app_name" android:supportsRtl="true" android:theme="@style/AppTheme">
 
-        <activity android:name=".MainActivity" android:label="@string/app_name"
+        <activity android:name=".activity.MainActivity" android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".CustomCaptureActivity"
+        <activity android:name=".activity.CustomCaptureActivity"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
             android:theme="@style/zxing_CaptureTheme"
@@ -38,7 +38,7 @@
 
         </activity>
 
-        <receiver android:name=".Kp2aAccessReceiver" android:exported="true">
+        <receiver android:name=".k2pa.Kp2aAccessReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="keepass2android.ACTION_TRIGGER_REQUEST_ACCESS" />
                 <action android:name="keepass2android.ACTION_RECEIVE_ACCESS" />
@@ -46,7 +46,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".Kp2aActionReceiver" android:exported="true">
+        <receiver android:name=".k2pa.Kp2aActionReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="keepass2android.ACTION_OPEN_ENTRY" />
                 <action android:name="keepass2android.ACTION_ENTRY_ACTION_SELECTED" />

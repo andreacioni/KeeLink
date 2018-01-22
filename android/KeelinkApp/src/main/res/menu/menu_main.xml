@@ -1,7 +1,7 @@
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="it.andreacioni.kp2a.plugin.keelink.MainActivity"
+    tools:context="it.andreacioni.kp2a.plugin.keelink.activity.MainActivity"
     android:layout_width="match_parent">
 
     <item
@@ -10,13 +10,16 @@
         app:showAsAction="ifRoom"
         app:actionLayout="@layout/toolbar_items" />
 
-    <item android:id="@+id/action_settings" android:orderInCategory="100"
-        android:title="@string/action_settings" app:showAsAction="never"
-        android:visible="false" />
+    <item android:id="@+id/fast_flag"
+        android:title="@string/action_settings"
+        android:checkable="true"/>
+
     <item android:id="@+id/howto"
         android:title="@string/howto" />
+
     <item android:title="@string/about"
         android:id="@+id/about" />
+
     <item android:title="@string/privacy"
         android:id="@+id/privacy" />
 

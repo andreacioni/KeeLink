@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">KeeLink</string>
-    <string name="action_settings">Settings</string>
+
+    <string name="action_settings">Fast Flag (Beta)</string>
     <string name="enable_as_plugin">Enable/Disable</string>
     <string name="about">About</string>
     <string name="howto">How to</string>
