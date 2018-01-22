@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import it.andreacioni.kp2a.plugin.keelink.R;
 import it.andreacioni.kp2a.plugin.keelink.activity.MainActivity;
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
+import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
 import keepass2android.pluginsdk.PluginAccessException;
 import keepass2android.pluginsdk.PluginActionBroadcastReceiver;
 import keepass2android.pluginsdk.Strings;
@@ -69,7 +70,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
 
     @Override
     public void onReceive(Context ctx, Intent intent) {
-        fastFlagSending = KeeLinkUtils.checkFastFlag(ctx);
+        fastFlagSending = KeeLinkUtils.checkFastFlagTimeout(ctx) && KeelinkPreferences.getBoolean(ctx, KeelinkPreferences.FLAG_FAST_ENABLE);
         super.onReceive(ctx,intent);
     }
 }

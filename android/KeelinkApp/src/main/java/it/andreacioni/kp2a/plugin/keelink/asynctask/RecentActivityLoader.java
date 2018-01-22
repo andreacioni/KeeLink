@@ -21,6 +21,7 @@ import java.util.Map;
 import it.andreacioni.kp2a.plugin.keelink.R;
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeelinkDefs;
+import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
 import keepass2android.pluginsdk.KeepassDefs;
 
 public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
@@ -43,7 +44,7 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
 
     @Override
     protected void onPreExecute() {
-        data = new ArrayList<Map<String,String>>();
+        data = new ArrayList<>();
         dialog.show();
 
         listView.clearChoices();
@@ -52,9 +53,8 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
 
-        SharedPreferences preferences = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE, Context.MODE_PRIVATE);
-        String jsonPref = preferences.getString(KeelinkDefs.RECENT_PREFERENCES_ENTRY,"[]");
-        JSONArray jsonArray = null;
+        String jsonPref = KeelinkPreferences.getString(ctx, KeelinkPreferences.RECENT_PREFERENCES_ENTRY);
+        JSONArray jsonArray;
 
         Log.d(TAG,"Recent array:" + jsonPref.toString());
 

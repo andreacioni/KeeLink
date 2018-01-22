@@ -2,7 +2,6 @@ package it.andreacioni.kp2a.plugin.keelink.keelink;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Base64;
 import android.util.Log;
 
@@ -76,13 +75,13 @@ public class KeeLinkUtils {
 
     public static void setFastFlag(Context ctx, boolean b) {
         Log.d(TAG,"Setting fast flag to true: " + b);
-        KeelinkPreferences.setLong(ctx, KeelinkPreferences.FLAG_FAST_SEND,b?System.currentTimeMillis():0L);
+        KeelinkPreferences.setLong(ctx, KeelinkPreferences.FLAG_FAST_TIMEOUT,b?System.currentTimeMillis():0L);
     }
 
-    public static boolean checkFastFlag(Context ctx) {
-        long l = KeelinkPreferences.getLong(ctx, KeelinkPreferences.FLAG_FAST_SEND, 0L);
+    public static boolean checkFastFlagTimeout(Context ctx) {
+        long l = KeelinkPreferences.getLong(ctx, KeelinkPreferences.FLAG_FAST_TIMEOUT);
         long s = l+KeelinkDefs.FAST_MILLIS_VALIDITY;
-        Log.d(TAG,"FLAG_FAST_SEND is " + l + ", sum is " + s + ", actual time: " +  System.currentTimeMillis());
+        Log.d(TAG,"FLAG_FAST_TIMEOUT is " + l + ", sum is " + s + ", actual time: " +  System.currentTimeMillis());
         boolean ret = (l+KeelinkDefs.FAST_MILLIS_VALIDITY > System.currentTimeMillis());
         return ret;
     }

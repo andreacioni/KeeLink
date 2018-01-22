@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeelinkDefs;
+import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
 import keepass2android.pluginsdk.KeepassDefs;
 
 /**
@@ -64,8 +65,7 @@ public class AsyncSavePreferencesTask extends AsyncTask<Void,Void,Void> {
 
     private void saveChoiceOnPref() {
         if(json != null && json.startsWith("{") && json.endsWith("}") && id != null && !id.isEmpty()) {
-            SharedPreferences pref = ctx.getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE, Context.MODE_PRIVATE);
-            String currentHistory = pref.getString(KeelinkDefs.RECENT_PREFERENCES_ENTRY,"[]");
+            String currentHistory = KeelinkPreferences.getString(ctx, KeelinkPreferences.RECENT_PREFERENCES_ENTRY);
             try {
                 JSONArray array = new JSONArray(currentHistory);
                 JSONObject o = new JSONObject(json);
@@ -102,10 +102,7 @@ public class AsyncSavePreferencesTask extends AsyncTask<Void,Void,Void> {
                     }
                 }
 
-
-                SharedPreferences.Editor editor = pref.edit();
-                editor.putString(KeelinkDefs.RECENT_PREFERENCES_ENTRY, array.toString());
-                editor.commit();
+                KeelinkPreferences.setString(ctx, KeelinkPreferences.RECENT_PREFERENCES_ENTRY, array.toString());
 
             } catch (JSONException e) {
                 Log.e(TAG,"Parsing exception on saving recents: " + e.getMessage());

@@ -40,6 +40,7 @@ import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeelinkDefs;
 import it.andreacioni.kp2a.plugin.keelink.R;
 import it.andreacioni.kp2a.plugin.keelink.asynctask.RecentActivityLoader;
+import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
 import keepass2android.pluginsdk.AccessManager;
 import keepass2android.pluginsdk.KeepassDefs;
 import keepass2android.pluginsdk.Kp2aControl;
@@ -181,6 +182,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             } else
                 switchh.setChecked(false);
 
+            if(KeelinkPreferences.getBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE)) {
+                MenuItem item = m.findItem(R.id.fast_flag);
+                item.setChecked(true);
+            }
+
             try {
                 PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
                 String version = pInfo.versionName;
@@ -205,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     item.setChecked(true);
                 }
 
-                KeeLinkUtils.setFastFlag(MainActivity.this, item.isChecked());
+                KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE, item.isChecked());
                 break;
             case R.id.go_online:
                 new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
@@ -267,8 +273,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             Snackbar.make(fab, "Keepass2Android not found", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
             fab.hide();
         }
-
-
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -337,7 +341,9 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private void openKeepassForSearch(String searchText) {
-        Intent i = Kp2aControl.getOpenEntryIntent(searchText, false, true);
+        //If fast flag is enabled so we need to close after open
+        boolean flagFastEnable = KeelinkPreferences.getBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE);
+        Intent i = Kp2aControl.getOpenEntryIntent(searchText, false, flagFastEnable);
         startActivityForResult(i, START_KEEPASS_CODE);
     }
 
@@ -384,9 +390,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private void removeSelectedEntry() {
-        SharedPreferences pref = getSharedPreferences(KeelinkDefs.RECENT_PREFERENCES_FILE, Context.MODE_PRIVATE);
         try {
-            JSONArray jArray = new JSONArray(pref.getString(KeelinkDefs.RECENT_PREFERENCES_ENTRY,"[]"));
+            JSONArray jArray = new JSONArray(KeelinkPreferences.getString(getApplicationContext(), KeelinkPreferences.RECENT_PREFERENCES_ENTRY));
         } catch (JSONException e) { Log.e(TAG,"Not a valid selected item" + selected.toString()); }
         String id = selected.get(KeelinkDefs.GUID_FIELD);
         JSONObject obj = new JSONObject(selected);

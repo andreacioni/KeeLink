@@ -3,7 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/KeelinkApp/KeelinkApp.iml" filepath="$PROJECT_DIR$/KeelinkApp/KeelinkApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KeelinkApp/KeelinkApp.iml" filepath="$PROJECT_DIR$/KeelinkApp/KeelinkApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/keepass2AndroidPluginSDK/keepass2AndroidPluginSDK.iml" filepath="$PROJECT_DIR$/keepass2AndroidPluginSDK/keepass2AndroidPluginSDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/keepass2AndroidPluginSDK/keepass2AndroidPluginSDK.iml" filepath="$PROJECT_DIR$/keepass2AndroidPluginSDK/keepass2AndroidPluginSDK.iml" />
     </modules>
   </component>
