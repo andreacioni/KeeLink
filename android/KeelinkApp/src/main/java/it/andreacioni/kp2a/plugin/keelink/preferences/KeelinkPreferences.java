@@ -21,10 +21,15 @@ public class KeelinkPreferences {
 
     public static final String RECENT_PREFERENCES_FILE = "preferences"; //Generic file where we place our preferences
 
+    //Keys
     public static final String RECENT_PREFERENCES_ENTRY = "recentHistory"; //String
     public static final String FLAG_FAST_TIMEOUT = "fastSend"; //Long
     public static final String FLAG_FAST_ENABLE= "fastSendEnable"; //Boolean
 
+    /*
+        Following maps are used to set default value when querying value from preferences.
+        If you don't set one default value for every key you will get a #RuntimeException
+     */
     private static final Map<String, String> DEFAULT_STRING_VALUES;
     private static final Map<String, Long> DEFAULT_LONG_VALUES;
     private static final Map<String, Boolean> DEFAULT_BOOLEAN_VALUES;

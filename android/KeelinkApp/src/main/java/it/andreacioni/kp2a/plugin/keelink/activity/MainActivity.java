@@ -145,6 +145,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     protected void onResume() {
         super.onResume();
 
+        //This ensure action mode to terminate when coming back to KeeLink
+        if(mActionMode != null) {
+            mActionMode.finish();
+        }
+
         supportInvalidateOptionsMenu();
 
         ListView l = ((ListView) findViewById(R.id.recent_list));
