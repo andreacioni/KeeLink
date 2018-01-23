@@ -39,7 +39,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
         }
 
         if(fastFlagSending) {
-            Log.d(TAG,"Flash sendig enbled");
+            Log.d(TAG,"Flash sending enabled");
             Intent i = new Intent(oe.getContext(), MainActivity.class);
 
             i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(oe.getEntryFields()).toString());
@@ -48,7 +48,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
 
             oe.getContext().startActivity(i);
         } else
-            Log.d(TAG,"Flash sendig disabled");
+            Log.d(TAG,"Flash sending disabled");
 
     }
 

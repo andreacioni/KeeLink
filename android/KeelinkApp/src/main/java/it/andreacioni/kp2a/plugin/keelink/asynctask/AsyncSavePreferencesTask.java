@@ -2,7 +2,6 @@ package it.andreacioni.kp2a.plugin.keelink.asynctask;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 

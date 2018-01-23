@@ -2,7 +2,6 @@ package it.andreacioni.kp2a.plugin.keelink.asynctask;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ListView;
@@ -90,6 +89,7 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
     }
 
     private void prepareList() {
+        boolean listEnabled = true;
 
         if(data.isEmpty()) {
             HashMap placeholder = new HashMap<String, String>();
@@ -99,6 +99,7 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
             placeholder.put(KeelinkDefs.GUID_FIELD,"0");
 
             data.add(placeholder);
+            listEnabled = false;
         }
 
         Log.d(TAG,"Data array: " + data.toString());
@@ -109,6 +110,8 @@ public class RecentActivityLoader extends AsyncTask<Void,Void,Void> {
 
         listView.invalidateViews();
         listView.requestLayout();
+
+        listView.setEnabled(listEnabled);
 
         Log.d(TAG,"List reloaded");
     }

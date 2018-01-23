@@ -1,8 +1,7 @@
 package it.andreacioni.kp2a.plugin.keelink.activity;
 
-import android.content.Context;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -129,6 +128,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 }
             }
         });
+
+        reloadList();
     }
 
     @Override
@@ -144,9 +145,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     @Override
     protected void onResume() {
         super.onResume();
+        unselectAndReloadListView();
+        snackStatusShow();
 
-        //This ensure action mode to terminate when coming back to KeeLink
-        if(mActionMode != null) {
+        /*//This ensure action mode to terminate when coming back to KeeLink
+        if(mActionMode != null) { TO BE REMOVED --> CAUSING exception: rect bound
             mActionMode.finish();
         }
 
@@ -158,7 +161,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             reloadList();
         } else
             Log.w(TAG,"Cannot invalidate position in list");
-        snackStatusShow();
+
+        snackStatusShow();*/
     }
 
 
@@ -342,12 +346,23 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private void openKeepass() {
-        openKeepassForSearch("");
+        PackageManager manager = getPackageManager();
+        try {
+            Intent i = manager.getLaunchIntentForPackage("keepass2android.keepass2android");
+            if (i == null) {
+                throw new ActivityNotFoundException();
+            }
+            i.addCategory(Intent.CATEGORY_LAUNCHER);
+            startActivity(i);
+        } catch (ActivityNotFoundException e) {
+            Log.e(TAG, e.getMessage());
+        }
     }
 
     private void openKeepassForSearch(String searchText) {
         //If fast flag is enabled so we need to close after open
         boolean flagFastEnable = KeelinkPreferences.getBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE);
+        Log.d(TAG, "Fast flag enable is:" + flagFastEnable);
         Intent i = Kp2aControl.getOpenEntryIntent(searchText, false, flagFastEnable);
         startActivityForResult(i, START_KEEPASS_CODE);
     }
@@ -396,7 +411,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     private void removeSelectedEntry() {
         try {
-            JSONArray jArray = new JSONArray(KeelinkPreferences.getString(getApplicationContext(), KeelinkPreferences.RECENT_PREFERENCES_ENTRY));
+            new JSONArray(KeelinkPreferences.getString(getApplicationContext(), KeelinkPreferences.RECENT_PREFERENCES_ENTRY));
         } catch (JSONException e) { Log.e(TAG,"Not a valid selected item" + selected.toString()); }
         String id = selected.get(KeelinkDefs.GUID_FIELD);
         JSONObject obj = new JSONObject(selected);
@@ -438,6 +453,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     }
 
+    private void unselectAndReloadListView() {
+        reloadList();
+        selected = null;
+        if(mActionMode != null) {
+            mActionMode.finish();
+            mActionMode = null;
+            mActionMode = null;
+        }
+
+        selected = null;
+    }
+
     private void validSidReceived(String sid, String password) {
 
         if (snackStatusShow()) {
@@ -453,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     else {
                         new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
                                 .setTitleText("Error")
-                                .setContentText("There was an error comunicating with the server, try again.")
+                                .setContentText("There was an error communicating with the server, try again.")
                                 .show();
                     }
 
@@ -490,8 +517,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
-        reloadList();
-        selected = null;
-        mActionMode = null;
+        unselectAndReloadListView();
     }
 }
