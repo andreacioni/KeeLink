@@ -2,7 +2,7 @@ package it.andreacioni.kp2a.plugin.keelink;
 
 import org.junit.Test;
 
-import java.security.PublicKey;
+import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
 
 import static org.junit.Assert.*;
 
