@@ -6,7 +6,7 @@
 
 <p align="center"><i>a Keepass2Android Plug-In</i></p>
 
-<p>More info and online service: <a href="https://keelink.cloud?onlyinfo=true">https://keelink.cloud</a>
+<p>More info and <b>online service</b>: <a href="https://keelink.cloud?onlyinfo=true">https://keelink.cloud</a>
 
 <p>Based on work of:<p>
 <ul>
