@@ -147,22 +147,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         super.onResume();
         unselectAndReloadListView();
         snackStatusShow();
-
-        /*//This ensure action mode to terminate when coming back to KeeLink
-        if(mActionMode != null) { TO BE REMOVED --> CAUSING exception: rect bound
-            mActionMode.finish();
-        }
-
-        supportInvalidateOptionsMenu();
-
-        ListView l = ((ListView) findViewById(R.id.recent_list));
-        if(l != null) {
-            l.setSelection(ListView.INVALID_POSITION);
-            reloadList();
-        } else
-            Log.w(TAG,"Cannot invalidate position in list");
-
-        snackStatusShow();*/
     }
 
 
@@ -170,9 +154,12 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
 
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
         prepareMenu(menu);
-
         return true;
     }
 
@@ -250,7 +237,6 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     }
 
     private boolean enableDisablePlugin() {
-
         try {
             Intent i = new Intent(Strings.ACTION_EDIT_PLUGIN_SETTINGS);
             i.putExtra(Strings.EXTRA_PLUGIN_PACKAGE, getPackageName());
