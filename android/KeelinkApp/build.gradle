@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "it.andreacioni.kp2a.plugin.keelink"
-        minSdkVersion 9
-        targetSdkVersion 27
+        minSdkVersion 14
+        targetSdkVersion 26
         versionCode 23
         versionName "1.1.4"
 
@@ -30,8 +30,8 @@ dependencies {
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     implementation 'com.google.zxing:core:3.2.1'
     implementation 'com.github.thomper:sweet-alert-dialog:v1.4.0'
-    implementation 'com.android.support:appcompat-v7:24.2.1'
-    implementation 'com.android.support:design:24.2.1'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:design:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'
     implementation project(':keepass2AndroidPluginSDK')
