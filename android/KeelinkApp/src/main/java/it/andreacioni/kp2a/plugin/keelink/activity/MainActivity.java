@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     @Override
     protected void onResume() {
         super.onResume();
+        invalidateOptionsMenu();
         unselectAndReloadListView();
         snackStatusShow();
     }
