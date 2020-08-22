@@ -19,6 +19,11 @@ var pollingInterval;
 var _query_string = parseWindowURL();
 
 function init() {
+	//Hide hosting if SelfHosted
+	if(!window.location.hostname.toLowerCase().endsWith("keelink.cloud")) {
+		$("#hostedby").hide();
+	}
+	
 	if(_query_string && (_query_string.onlyinfo === true || _query_string.onlyinfo === 'true')) {
 		$("#qrplaceholder").hide();
 	} else {
@@ -40,7 +45,6 @@ function init() {
 		$('a.navbar-link[href$="' + _query_string.show + '"').trigger('click');
 		//window.location.hash = "#" + _query_string.show;
 	}
-	
 }
 
 function requestInit() {
@@ -116,45 +120,35 @@ function passwordLooker() {
 		}
 	} else {
 		invalidateSession(); 
-		alertWarn("No credentials received...","No credential was received in the last minute, reload page to start a new session");
+		alertWarnReload("No credentials received...","No credential was received in the last minute, reload page to start a new session");
 	}
 }
 
 function initClipboardButtons(username,password) {
+	$("#copyUserBtn").show();
 	$("#copyPswBtn").show();
-	$("#moreBtn").show().click(
-		function(){
-			if($("#clearBtn").is(":hidden")) {
-				$("#copyUserBtn").slideDown();
-				$("#clearBtn").slideDown();
-			} else {
-				$("#copyUserBtn").slideDown();
-				$("#clearBtn").slideUp();
-			}
-		}
-	);
+	$("#clearBtn").show();
 	
 	$("#copyUserBtn,.swal-button").attr("data-clipboard-text",username);
 	$("#copyPswBtn,.swal-button").attr("data-clipboard-text",password);
 	
 	//Copy username to clipboard button
-	var clipCopyUser = new Clipboard('#copyUserBtn,.swal-button');
+	var clipCopyUser = new ClipboardJS('#copyUserBtn,.swal-button');
 	clipCopyUser.on('success', function() {
 		remindDelete();
 	});
 	
 	//Copy password to clipboard button
-	var clipCopyPsw = new Clipboard('#copyPswBtn,.swal-button');
+	var clipCopyPsw = new ClipboardJS('#copyPswBtn,.swal-button');
 	clipCopyPsw.on('success', function() {
 		remindDelete();
 	});
 
 	//Clear clipboard button
-	new Clipboard('#clearBtn');
+	new ClipboardJS('#clearBtn');
 
 	$("#clearBtn").click(function() { 
-		alertSuccess("Ok","Clipboard cleared!"); 
-		$("#moreBtn").click();
+		alertSuccess("Ok","Clipboard cleared!");
 	});
 }
 
@@ -192,6 +186,18 @@ function alertWarn(title,msg) {
 	title: title,
 	text: msg,
 	icon: "warning"
+	});
+}
+
+function alertWarnReload(title,msg) {
+	swal({
+	title: title,
+	text: msg,
+	icon: "warning",
+	button: "Reload",
+	}).then((value)=>{
+		if(value)
+			location.reload();
 	});
 }
 
