@@ -3,3 +3,4 @@
 # Except
 !.gitignore
 !config.default.ini
+!InitMySQL.sql

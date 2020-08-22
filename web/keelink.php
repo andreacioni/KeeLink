@@ -22,12 +22,12 @@ class KeeLink {
                 $jresp['message'] = "Error(1): Captcha required";
             } else {
                 $conn = KeeLink::getConnection();
-                $sqlInserUser = $conn->prepare("REPLACE INTO User (UserId, LastAccess, SidCreated) VALUES (:UserId, CURRENT_TIMESTAMP, IFNULL((SELECT COUNT (UserId) FROM User WHERE UserId = :UserId), 0) + 1)");
-                    $sqlInserUser->bindParam(":UserId", $_SERVER['REMOTE_ADDR']);
-                $sqlInsertSID = $conn->prepare("REPLACE INTO Keepass (SessionId, UserId, PublicKey) VALUES (:SessionId, :UserId, :PublicKey)");
-                    $sqlInsertSID->bindParam(":SessionId", $sid);
-                    $sqlInsertSID->bindParam(":UserId", $_SERVER['REMOTE_ADDR']);
-                    $sqlInsertSID->bindParam(":PublicKey", $publickey);
+                $sqlInserUser = $conn->prepare("REPLACE INTO User (User_Id, Last_Access, Sid_Created) VALUES (:User_Id, CURRENT_TIMESTAMP, IFNULL((SELECT COUNT (User_Id) FROM User WHERE User_Id = :User_Id), 0) + 1)");
+                    $sqlInserUser->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
+                $sqlInsertSID = $conn->prepare("REPLACE INTO Keepass (Session_Id, User_Id, Public_Key) VALUES (:Session_Id, :User_Id, :Public_Key)");
+                    $sqlInsertSID->bindParam(":Session_Id", $sid);
+                    $sqlInsertSID->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
+                    $sqlInsertSID->bindParam(":Public_Key", $publickey);
                 
                 if ($sqlInserUser->execute() === TRUE) {
                     if ($sqlInsertSID->execute() === TRUE) {
@@ -59,8 +59,8 @@ class KeeLink {
                 $jresp['message'] = "Error(2): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                $sql = $conn->prepare("SELECT Psw FROM Keepass WHERE SessionId = :SessionId AND Psw IS NOT NULL");
-                    $sql->bindParam(":SessionId", $sid);
+                $sql = $conn->prepare("SELECT Psw FROM Keepass WHERE Session_Id = :Session_Id AND Psw IS NOT NULL");
+                    $sql->bindParam(":Session_Id", $sid);
                 $sql->execute();
                 $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
@@ -89,8 +89,8 @@ class KeeLink {
                 $jresp['message'] = "Error(3): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                $sql = $conn->prepare("DELETE FROM Keepass WHERE SessionId = :SessionId");
-                    $sql->bindParam(":SessionId", $sid);
+                $sql = $conn->prepare("DELETE FROM Keepass WHERE Session_Id = :Session_Id");
+                    $sql->bindParam(":Session_Id", $sid);
                 
                 if ($sql->execute() === TRUE) {
                     $jresp['message'] = "OK";
@@ -117,9 +117,9 @@ class KeeLink {
                 $jresp['message'] = "Error(4): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                $sql = $conn->prepare("UPDATE Keepass SET Psw = :Psw WHERE SessionId = :SessionId AND Psw IS NULL");
+                $sql = $conn->prepare("UPDATE Keepass SET Psw = :Psw WHERE Session_Id = :Session_Id AND Psw IS NULL");
                     $sql->bindParam(":Psw", $conn->real_escape_string($psw));
-                    $sql->bindParam(":SessionId", $sid);
+                    $sql->bindParam(":Session_Id", $sid);
                 
                 if (($sql->execute() === TRUE) && ($sql->rowCount() == 1)) {
                     $jresp['message'] = "OK";
@@ -146,13 +146,13 @@ class KeeLink {
                 $jresp['message'] = "Error(5): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                $sql = $conn->prepare("SELECT PublicKey FROM Keepass WHERE SessionId = :SessionId");
-                    $sql->bindParam(":SessionId", $sid);
+                $sql = $conn->prepare("SELECT PublicKey FROM Keepass WHERE Session_Id = :Session_Id");
+                    $sql->bindParam(":Session_Id", $sid);
                 $sql->execute();
                 $result = $sql->fetchAll(PDO::FETCH_ASSOC);
                 
                 if ($result && count($result) == 1) {                   
-                    $jresp['message'] = $result[0]['PublicKey'];
+                    $jresp['message'] = $result[0]['Public_Key'];
                     $jresp['status'] = TRUE;
                 } else {
                     $jresp['message'] = "Error(5): Error fetching public key";
@@ -179,13 +179,13 @@ class KeeLink {
     }
     
     static private function needCaptcha($conn) {
-        $sql = $conn->prepare("SELECT SidCreated FROM User WHERE UserId = :UserId");
+        $sql = $conn->prepare("SELECT Sid_Created FROM User WHERE User_Id = :User_Id");
             $sql->bindParam(":UserId", $_SERVER['REMOTE_ADDR']);
         $sql->execute();
         $result = $sql->fetchAll(PDO::FETCH_ASSOC);
         
         if ($result && count($result) == 1) {
-            $attempts = $result[0]["SidCreated"];
+            $attempts = $result[0]["Sid_Created"];
             if($attempts > 5)
                 return TRUE;
         } 
@@ -237,18 +237,18 @@ class KeeLink {
             try
             {
                 $conn -> exec ("CREATE TABLE IF NOT EXISTS [User] (
-                                UserId TEXT PRIMARY KEY NOT NULL,
-                                LastAccess DATETIME DEFAULT (CURRENT_TIMESTAMP),
-                                SidCreated INTEGER NOT NULL DEFAULT (1) 
+                                User_Id TEXT PRIMARY KEY NOT NULL,
+                                Last_Access DATETIME DEFAULT (CURRENT_TIMESTAMP),
+                                Sid_Created INTEGER NOT NULL DEFAULT (1) 
                             );");
                 $conn -> exec ("CREATE TABLE IF NOT EXISTS [Keepass] (
-                                SessionId TEXT NOT NULL PRIMARY KEY,
-                                Uname TEXT,
+                                Session_Id TEXT NOT NULL PRIMARY KEY,
+                                Username TEXT,
                                 Psw TEXT,
-                                CreationDate DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
-                                UserId TEXT NOT NULL,
-                                PublicKey TEXT NOT NULL,
-                                FOREIGN KEY (UserId) REFERENCES User (UserId)
+                                Creation_Date DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+                                User_Id TEXT NOT NULL,
+                                Public_Key TEXT NOT NULL,
+                                FOREIGN KEY (User_Id) REFERENCES User (User_Id)
                             );");
                 $conn -> exec ("PRAGMA encoding = 'UTF-8';");  
             }

@@ -1,0 +1,19 @@
+DROP TABLE IF EXISTS KEEPASS;
+DROP TABLE IF EXISTS USER;
+
+CREATE TABLE USER (
+  User_Id varchar(255) NOT NULL PRIMARY KEY,
+  Last_Access timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  Sid_Created int unsigned NOT NULL DEFAULT 1
+) ENGINE=MyISAM DEFAULT CHARSET utf8;
+
+CREATE TABLE KEEPASS (
+  Session_Id varchar(255) NOT NULL PRIMARY KEY,
+  Username longtext,
+  Psw longtext,
+  Creation_Date timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  User_Id varchar(255) NOT NULL,
+  Public_Key varchar(512) NOT NULL,
+
+  FOREIGN KEY (User_Id) REFERENCES USER(User_Id)
+) ENGINE=MyISAM DEFAULT CHARSET utf8;
