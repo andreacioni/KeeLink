@@ -22,12 +22,13 @@ class KeeLink {
                 $jresp['message'] = "Error(1): Captcha required";
             } else {
                 $conn = KeeLink::getConnection();
-                $sqlInserUser = $conn->prepare("INSERT INTO User (UserId) VALUES(:UserId) ON CONFLICT(UserId) DO UPDATE SET SidCreated=SidCreated+1, LastAccess=CURRENT_TIMESTAMP;");
+                $sqlInserUser = $conn->prepare("REPLACE INTO User (UserId, LastAccess, SidCreated) VALUES (:UserId, CURRENT_TIMESTAMP, IFNULL((SELECT COUNT (UserId) FROM User WHERE UserId = :UserId), 0) + 1)");
                     $sqlInserUser->bindParam(":UserId", $_SERVER['REMOTE_ADDR']);
-                $sqlInsertSID = $conn->prepare("INSERT INTO Keepass (SessionId, UserId, PublicKey) VALUES(:SessionId, :UserId, :PublicKey) ON CONFLICT(SessionId) DO UPDATE SET PublicKey=:PublicKey;");
+                $sqlInsertSID = $conn->prepare("REPLACE INTO Keepass (SessionId, UserId, PublicKey) VALUES (:SessionId, :UserId, :PublicKey)");
                     $sqlInsertSID->bindParam(":SessionId", $sid);
                     $sqlInsertSID->bindParam(":UserId", $_SERVER['REMOTE_ADDR']);
                     $sqlInsertSID->bindParam(":PublicKey", $publickey);
+                
                 if ($sqlInserUser->execute() === TRUE) {
                     if ($sqlInsertSID->execute() === TRUE) {
                         $jresp['status'] = TRUE;
@@ -208,19 +209,31 @@ class KeeLink {
     }
     
     static private function getConnection() {
-        $dbExists = file_exists("KeeLink.db");
+        $isMySql = file_exists("private/config.ini");
+        $dbSqliteExists = file_exists("private/KeeLink.db");
+        
         try
         {
-            $conn = new PDO("sqlite:KeeLink.db");
+            if($isMySql) {
+                $CONFIG_INI = parse_ini_file("private/config.ini");
+                if($CONFIG_INI == FALSE) {
+                    error_log("MySQL configuration file not found!");
+                    die;
+                }
+            $conn = new PDO("mysql:host=" . $CONFIG_INI['host'] . ";port=" . $CONFIG_INI['port'] . ";dbname=" . $CONFIG_INI['dbname'] . ";charset=utf8", $CONFIG_INI['username'], $CONFIG_INI['password']); 
+            } else {
+                //SQLite
+                $conn = new PDO("sqlite:private/KeeLink.db");
+            }
         }
         catch(PDOException $e)
         {
             error_log($e->getMessage());
-            die('Exception: unable to open SQlite DB!');
+            die('Exception: unable to open Database!');
         }
         
-        //Create DB if not exists
-        if (!$dbExists) {
+        //Create SQLite DB if not exists
+        if (!$isMySql and !$dbSqliteExists) {
             try
             {
                 $conn -> exec ("CREATE TABLE IF NOT EXISTS [User] (
