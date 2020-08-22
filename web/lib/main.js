@@ -22,7 +22,8 @@ function init() {
 	if(_query_string && (_query_string.onlyinfo === true || _query_string.onlyinfo === 'true')) {
 		$("#qrplaceholder").hide();
 	} else {
-		detectHttpProtocol();
+		generateKeyPair();
+		requestInit();
 	}
 
 	//Enable scrolling effect on anchor clicking
@@ -74,17 +75,6 @@ function generateKeyPair() {
 	_crypt = new JSEncrypt({default_key_size: DEFAULT_KEY_SIZE});
 	_crypt.getKey();
 	log(_crypt.getPublicKey());
-}
-
-function detectHttpProtocol() {
-	//TODO No warn, redirect!
-	$("#sidLabel").text("HTTPS protocol check...");
-	if (window.location.protocol != "https:") {
-		window.location.href = "https:" + window.location.href.substring(window.location.protocol.length);
-	} else {
-		generateKeyPair();
-		requestInit();
-	}
 }
 
 function parseWindowURL() {
