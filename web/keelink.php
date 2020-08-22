@@ -50,7 +50,7 @@ class KeeLink {
         return json_encode($jresp);
     }
     
-    static public function getPasswordForSid($sid) {
+    static public function getCredentialsForSid($sid) {
         $jresp['status'] = FALSE;
         $inputok = KeeLink::validateMD5($sid);
 
@@ -59,17 +59,18 @@ class KeeLink {
                 $jresp['message'] = "Error(2): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                $sql = $conn->prepare("SELECT Psw FROM Keepass WHERE Session_Id = :Session_Id AND Psw IS NOT NULL");
+                $sql = $conn->prepare("SELECT Username, Psw FROM Keepass WHERE Session_Id = :Session_Id AND (Username IS NOT NULL OR Psw IS NOT NULL)");
                     $sql->bindParam(":Session_Id", $sid);
                 $sql->execute();
                 $result = $sql->fetchAll(PDO::FETCH_ASSOC);
 
                 if ($result && count($result) == 1) {
                     $_SESSION['generatedSid'] = NULL;
-                    $jresp['message'] = $result[0]['Psw'];
+                    $jresp['username'] = $result[0]['Username'];
+                    $jresp['password'] = $result[0]['Psw'];
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error(2): Error fetching password";
+                    $jresp['message'] = "Error(2): Error fetching credentials";
                 }
                 $conn = null;
             }
@@ -107,17 +108,18 @@ class KeeLink {
         return json_encode($jresp);
     }
     
-    static public function setPasswordForSid($sid,$psw) {
+    static public function setCredentialsForSid($sid,$username,$psw) {
         $jresp['status'] = FALSE;
         
         $inputok = KeeLink::validateMD5($sid);
 
         if($inputok) {
-            if($sid === NULL || $psw === NULL) {
+            if($sid === NULL || $username === NULL || $psw === NULL) {
                 $jresp['message'] = "Error(4): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                $sql = $conn->prepare("UPDATE Keepass SET Psw = :Psw WHERE Session_Id = :Session_Id AND Psw IS NULL");
+                $sql = $conn->prepare("UPDATE Keepass SET Username = :Username, Psw = :Psw WHERE Session_Id = :Session_Id AND Username IS NULL AND Psw IS NULL");
+                    $sql->bindParam(":Username", $conn->real_escape_string($username));
                     $sql->bindParam(":Psw", $conn->real_escape_string($psw));
                     $sql->bindParam(":Session_Id", $sid);
                 

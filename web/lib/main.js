@@ -7,7 +7,7 @@ var REQUEST_INTERVAL = 2000;
 
 var REMINDER_DELETE_CLIPBOARD = 10000;
 var REMINDER_TITLE = "Don't forget!";
-var REMINDER_BODY = "Remember to clear your clipboard, your password is still there!";
+var REMINDER_BODY = "Remember to clear your clipboard, your credentials are still there!";
 
 var DEFAULT_KEY_SIZE = 1024; //TODO test 2048 and persist on browser cache
 
@@ -112,30 +112,40 @@ function passwordLooker() {
 	if(!invalidateSid) {
 		if(requestFinished) {
 			requestFinished = false;
-			$.get("getpassforsid.php",{'sid':_sid},onSuccess,"json").always(function() {requestFinished = true;});
+			$.get("getcredforsid.php",{'sid':_sid},onSuccess,"json").always(function() {requestFinished = true;});
 		}
 	} else {
 		invalidateSession(); 
-		alertWarn("No password received...","No password was received in the last minute, reload page to start a new session");
+		alertWarn("No credentials received...","No credential was received in the last minute, reload page to start a new session");
 	}
 }
 
-function initClipboardButton(password) {
-	$("#copyBtn").show();
+function initClipboardButtons(username,password) {
+	$("#copyPswBtn").show();
 	$("#moreBtn").show().click(
 		function(){
-			if($("#clearBtn").is(":hidden"))
+			if($("#clearBtn").is(":hidden")) {
+				$("#copyUserBtn").slideDown();
 				$("#clearBtn").slideDown();
-			else
+			} else {
+				$("#copyUserBtn").slideDown();
 				$("#clearBtn").slideUp();
+			}
 		}
 	);
 	
-	$("#copyBtn,.swal-button").attr("data-clipboard-text",password);
+	$("#copyUserBtn,.swal-button").attr("data-clipboard-text",username);
+	$("#copyPswBtn,.swal-button").attr("data-clipboard-text",password);
 	
-	//Copy paassowrd to clipboard button
-	var clipCopy = new Clipboard('#copyBtn,.swal-button');
-	clipCopy.on('success', function() {
+	//Copy username to clipboard button
+	var clipCopyUser = new Clipboard('#copyUserBtn,.swal-button');
+	clipCopyUser.on('success', function() {
+		remindDelete();
+	});
+	
+	//Copy password to clipboard button
+	var clipCopyPsw = new Clipboard('#copyPswBtn,.swal-button');
+	clipCopyPsw.on('success', function() {
 		remindDelete();
 	});
 
@@ -218,25 +228,31 @@ function remindDelete() {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
-		log("Encoded password: " + data.message);
-		data.message = fromSafeBase64(data.message);
-		log("Decoded password: " + data.message);
-		decryptedPsw = _crypt.decrypt(data.message);
-		if(decryptedPsw) {
+		log("Encoded username: " + data.username);
+		data.username = fromSafeBase64(data.username);
+		log("Decoded username: " + data.username);
+		decryptedUsername = _crypt.decrypt(data.username);
+		log("Encoded password: " + data.password);
+		data.password = fromSafeBase64(data.password);
+		log("Decoded password: " + data.password);
+		decryptedPsw = _crypt.decrypt(data.password);
+		if(decryptedUsername && decryptedPsw) {
+			log("Decrypted username: " + decryptedUsername);
 			log("Decrypted password: " + decryptedPsw);
-			alertSuccess("Password received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
-			initClipboardButton(decryptedPsw);
+			alertSuccess("Credentials received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
+			initClipboardButtons(decryptedUsername, decryptedPsw);
 			$.post("removeentry.php",{'sid':_sid},function(){},"json");
 			invalidateSession();
 		} else {
-			alertError("Error", "There was an error, can't decrypt your password. Try again...");
+			alertError("Error", "There was an error, can't decrypt your credentials. Try again...");
 			invalidateSession();
 		}
 	}
 }
 
 function onFail(data,textStatus,jqXhr) {
-	alertError("Comunication Failure","Are you connected to Internet?")
+	errorMsg = (data != undefined && data.status === false) ? "Error: " + data.message : "Are you connected to Internet?"
+	alertError("Comunication Failure",errorMsg)
 }
 
 function invalidateSession() {
