@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL); //DEBUG
+//error_reporting(E_ALL); //DEBUG
 
 session_start();
 header("Content-Type: application/json");
@@ -19,7 +19,7 @@ class KeeLink {
 
         if($inputok) {
             if($jresp['captchaRequired'] === TRUE) {
-                $jresp['message'] = "Error(4): Captcha required";
+                $jresp['message'] = "Error(1): Captcha required";
             } else {
                 $conn = KeeLink::getConnection();
                 $sqlInserUser = $conn->prepare("INSERT INTO User (UserId) VALUES(:UserId) ON CONFLICT(UserId) DO UPDATE SET SidCreated=SidCreated+1, LastAccess=CURRENT_TIMESTAMP;");
@@ -34,16 +34,16 @@ class KeeLink {
                         $jresp['message'] = $sid;
                     } else {
                         error_log($sqlInsertSID->errorInfo()[2]);
-                        $jresp['message'] = "Error(2): ".$sqlInsertSID->errorCode();
+                        $jresp['message'] = "SQL Error(1): ".$sqlInsertSID->errorCode();
                     }
                 } else {
                     error_log($sqlInserUser->errorInfo()[2]);
-                    $jresp['message'] = "Error(2): ".$sqlInserUser->errorCode();
+                    $jresp['message'] = "SQL Error(1): ".$sqlInserUser->errorCode();
                 }
             }
             $conn = null;
         } else {
-            $jresp['message'] = "Error(1): Invalid public key received";
+            $jresp['message'] = "Error(1): Invalid public key provided";
         }
         
         return json_encode($jresp);
@@ -55,7 +55,7 @@ class KeeLink {
 
         if($inputok) {
             if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-                $jresp['message'] = "Invalid parameter passed (2)";
+                $jresp['message'] = "Error(2): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
                 $sql = $conn->prepare("SELECT Psw FROM Keepass WHERE SessionId = :SessionId AND Psw IS NOT NULL");
@@ -68,12 +68,12 @@ class KeeLink {
                     $jresp['message'] = $result[0]['Psw'];
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error fetching password (4)";
+                    $jresp['message'] = "Error(2): Error fetching password";
                 }
                 $conn = null;
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(2): Invalid sid provided";
         }
         
         return json_encode($jresp);
@@ -85,7 +85,7 @@ class KeeLink {
 
         if($inputok) {
             if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-                $jresp['message'] = "Invalid parameter passed (7)";
+                $jresp['message'] = "Error(3): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
                 $sql = $conn->prepare("DELETE FROM Keepass WHERE SessionId = :SessionId");
@@ -95,12 +95,12 @@ class KeeLink {
                     $jresp['message'] = "OK";
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error removing entry (8)";
+                    $jresp['message'] = "SQL Error(3): Error removing entry";
                 }
                 $conn = null;	
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(3): Invalid sid provided";
         }
         
         return json_encode($jresp);
@@ -113,7 +113,7 @@ class KeeLink {
 
         if($inputok) {
             if($sid === NULL || $psw === NULL) {
-                $jresp['message'] = "Invalid parameter passed (5)";
+                $jresp['message'] = "Error(4): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
                 $sql = $conn->prepare("UPDATE Keepass SET Psw = :Psw WHERE SessionId = :SessionId AND Psw IS NULL");
@@ -125,12 +125,12 @@ class KeeLink {
                     $jresp['status'] = TRUE;
                 } else {
                     error_log($sqlInsertSID->errorInfo()[2]);
-                    $jresp['message'] = "SQL Error (6): ".$sql->errorCode();
+                    $jresp['message'] = "SQL Error (4): ".$sql->errorCode();
                 }
                 $conn = null;
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(4): Invalid sid provided";
         }
         
         return json_encode($jresp);
@@ -142,7 +142,7 @@ class KeeLink {
 
         if($inputok) {
             if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-                $jresp['message'] = "Invalid parameter passed (2)";
+                $jresp['message'] = "Error(5): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
                 $sql = $conn->prepare("SELECT PublicKey FROM Keepass WHERE SessionId = :SessionId");
@@ -154,12 +154,12 @@ class KeeLink {
                     $jresp['message'] = $result[0]['PublicKey'];
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error fetching public key (4)";
+                    $jresp['message'] = "Error(5): Error fetching public key";
                 }
                 $conn = null;
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(5): Invalid sid provided";
         }
 
         return json_encode($jresp);
