@@ -36,6 +36,14 @@
   font-size: 30px;
 }
 
+.swal-text{
+	text-align:center;
+}
+
+.swal-footer {
+	text-align:center;
+}
+
 /*From Skelethon site*/
 
 .container {

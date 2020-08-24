@@ -70,7 +70,7 @@
 				
 				<div class="row">
 					<div class="twelve columns">
-						<p class="content-font" align="center"><b>Use this QR code to share a password from Keepass to this device</b></p>
+						<p class="content-font" align="center"><b>Use this QR code to share a credential from Keepass to this device</b></p>
 					</div>	
 				</div>
 				
@@ -84,8 +84,8 @@
 					<div class="twelve columns">
 						<p class="content-font" style="font-size:small" align="center"><b>Your Session ID: <br> <span id="sidLabel">Seems that your browser doesn't support JavaScript or it is disabled</span></b></p>
 						<p class="content-font" align="center">
-							<button id="copyBtn" data-clipboard-text="no password" hidden>Copy to clipboard</button>
-							<button id="moreBtn" hidden><i class="fa fa-angle-down" aria-hidden="true"></i></button>
+							<button id="copyUserBtn" data-clipboard-text="no username" hidden>Copy Username</button>
+							<button id="copyPassBtn" data-clipboard-text="no password" hidden>Copy Password</button>
 							<br>
 							<button id="clearBtn" data-clipboard-text=" " hidden>Clear clipboard</button>
 						</p>
@@ -101,7 +101,7 @@
 			<div id="howto" class="docs-section">
 				<h2>How To</h2>
 				<p>
-					In order to send password to this page you first need to follow <b>4 simple steps</b>:
+					In order to send credentials to this page you first need to follow <b>4 simple steps</b>:
 				</p>
 				<ol>
 					<!-- First step -->
@@ -114,7 +114,7 @@
 					</li>
 					
 					<li>
-						<b>Open this page</b> on the device you want to send the password.
+						<b>Open this page</b> on the device you want to send the credentials.
 					</li>
 
 					<li>
@@ -122,7 +122,7 @@
 					</li>
 
 					<li>
-						On the opened window you can <b>scan the QR code on this page</b> and wait for password to be sent.
+						On the opened window you can <b>scan the QR code on this page</b> and wait for credentials to be sent.
 					</li>
 				</ol>
 				<p>
@@ -137,19 +137,19 @@
 					
 					<li>The Android one<ul>
 						<li>
-							KeeLink Android application acts as a bridge from Keepass2Android to this web page. Every password is retrieved
-							from the Keepass Database (KDBX). Once the password is received, the application waits for the user to scan QR code 
+							KeeLink Android application acts as a bridge from Keepass2Android to this web page. Every credentials is retrieved
+							from the Keepass Database (KDBX). Once the credentials are received, the application waits for the user to scan QR code 
 							with its device camera. QR Code contains a simple URL as <i>ksid://yourpersonalanduniquesessionid</i>, so when the QR code 
-							is correctly parsed, the password is, firstly, encrypted with an <b>RSA 1024 bit</b> public key and then sent to a database and associated with <i>'yourpersonalanduniquesessionid'</i>. <b>No other information are sent 
-							over network</b>, <b>that is important for you</b> because it is essential for me to mantain your password as safe as possible. 
-							More security for your password was added by the <b>HTTPS/SSL</b> protocol that is used for real transmission from your Android device to this site.
+							is correctly parsed, the credentials are, firstly, encrypted with an <b>RSA 1024 bit</b> public key and then sent to a database and associated with <i>'yourpersonalanduniquesessionid'</i>. <b>No other information are sent 
+							over network</b>, <b>that is important for you</b> because it is essential for me to mantain your credentials as safe as possible. 
+							More security for your credentials was added by the <b>HTTPS/SSL</b> protocol that is used for real transmission from your Android device to this site.
 						</li>
 					</ul></li>
 					<li>The PHP one<ul>
 						<li>
 							KeeLink PHP application acts only as a simple server that build a custom session ID, random generated, only for you. It is converted to 
-							QR Code and dispayed at the top of the page. Once QR is received your page starts querying database and listening for an upcoming password.
-							<b>When password is received, it will be deleted from database</b>.
+							QR Code and dispayed at the top of the page. Once QR is received your page starts querying database and listening for upcoming credentials.
+							<b>When credentials are received, they will be deleted from database</b>.
 						</li>
 					</ul></li>
 				</ul>
@@ -177,7 +177,7 @@
 							<li>Font Awasome - <a href="http://fontawesome.io/">http://fontawesome.io/</a></li>
 							<li>JQuery - <a href="http://jquery.com/">http://jquery.com/</a></li>
 							<li>QR JS library - <a href="https://davidshimjs.github.io/qrcodejs/">https://davidshimjs.github.io/qrcodejs/</a></li>
-							<li>JSencrypt - <a href="https://davidshimjs.github.io/qrcodejs/">https://github.com/travist/jsencrypt</a></li>
+							<li>JSencrypt - <a href="https://github.com/travist/jsencrypt">https://github.com/travist/jsencrypt</a></li>
 						</ul></li>
 					</ul>
 			</div>
@@ -203,7 +203,7 @@
 				<div class="container">
 					<div class="row">
 							<div class="six columns"><p>Brought to you by <b>Andrea Cioni</b></p></div>
-							<div class="six columns"><p>Hosted for free on <a href="https://www.000webhost.com/"><img height="16" src="images/000webhost_logo.png" /></a></p></div>
+							<div class="six columns" id="hostedby"><p>Hosted for free on <a href="https://www.000webhost.com/"><img height="16" src="images/000webhost_logo.png" /></a></p></div>
 							<div align="center" class="ten columns"><p><a href="https://github.com/andreacioni/KeeLink"><img height="50" src="images/github_logo.png" /></a></p></div>
 					</div>
 				</div>

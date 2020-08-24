@@ -1,8 +1,7 @@
 <?php
-error_reporting(E_ERROR); //This disable unwanted warning when config file not found
+//error_reporting(E_ALL); //DEBUG
 
 session_start();
-
 header("Content-Type: application/json");
 
 //Cloudflare need this!
@@ -13,131 +12,128 @@ if (isset($_SERVER["HTTP_CF_CONNECTING_IP"])) {
 class KeeLink {
     
     static public function initNewSession($publickey) {
-        
         $jresp['status'] = false;
-        
         $sid = KeeLink::generateSid();
-        
         $inputok = KeeLink::validateBase64Input($publickey);
-        
-        $jresp['chaptaRequired'] = FALSE;//TODO KeeLink::needChapta($conn);
+        $conn = KeeLink::getConnection();
+        $jresp['captchaRequired'] = KeeLink::needCaptcha($conn);
 
         if($inputok) {
-            $conn = KeeLink::getConnection();
-            
-            if($jresp['chaptaRequired'] === TRUE) {
-                $jresp['message'] = "Error(4): Chapta required";
+            if($jresp['captchaRequired'] === TRUE) {
+                $jresp['message'] = "Too many connections from your address, please try again later!";
             } else {
-                $sqlInserUser = "insert into `USER`(USER_ID) values ('" . $_SERVER['REMOTE_ADDR'] . "') on duplicate key update USER.SID_CREATED=USER.SID_CREATED+1, USER.LAST_ACCESS=CURRENT_TIMESTAMP";
-                $sqlInsertSID = "insert into KEEPASS(SESSION_ID,USER_ID,PUBLIC_KEY) values ('" . $sid . "','". $_SERVER['REMOTE_ADDR'] ."','". $publickey ."') on duplicate key update PUBLIC_KEY='".$publickey."'";
+                $sqlInserUser = $conn->prepare("REPLACE INTO User (User_Id, Last_Access, Sid_Created) VALUES (:User_Id, CURRENT_TIMESTAMP, IFNULL((SELECT COUNT (User_Id) FROM User WHERE User_Id = :User_Id), 0) + 1)");
+                    $sqlInserUser->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
+                $sqlInsertSID = $conn->prepare("REPLACE INTO Keepass (Session_Id, User_Id, Public_Key) VALUES (:Session_Id, :User_Id, :Public_Key)");
+                    $sqlInsertSID->bindParam(":Session_Id", $sid);
+                    $sqlInsertSID->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
+                    $sqlInsertSID->bindParam(":Public_Key", $publickey);
                 
-                if ($conn->query($sqlInserUser) === TRUE) {
-                    if ($conn->query($sqlInsertSID) === TRUE) {
+                if ($sqlInserUser->execute() === TRUE) {
+                    if ($sqlInsertSID->execute() === TRUE) {
                         $jresp['status'] = TRUE;
                         $jresp['message'] = $sid;
                     } else {
-                        $jresp['message'] = "Error(2): ".mysqli_error($conn);
+                        error_log($sqlInsertSID->errorInfo()[2]);
+                        $jresp['message'] = "SQL Error(1): ".$sqlInsertSID->errorCode();
                     }
                 } else {
-                    $jresp['message'] = "Error(3): ".mysqli_error($conn);
+                    error_log($sqlInserUser->errorInfo()[2]);
+                    $jresp['message'] = "SQL Error(1): ".$sqlInserUser->errorCode();
                 }
             }
-    
-            $conn->close();
+            $conn = null;
         } else {
-            $jresp['message'] = "Error(1): Invalid public key received";
+            $jresp['message'] = "Error(1): Invalid public key provided";
         }
         
         return json_encode($jresp);
     }
     
-    static public function getPasswordForSid($sid) {
+    static public function getCredentialsForSid($sid) {
         $jresp['status'] = FALSE;
-        
         $inputok = KeeLink::validateMD5($sid);
 
         if($inputok) {
             if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-                $jresp['message'] = "Invalid parameter passed (2)";
+                $jresp['message'] = "Error(2): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
-                
-                $sql = "select PSW from KEEPASS where SESSION_ID='".$sid."' and PSW is not null";
-                $result = $conn->query($sql);
-                
-                if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    $_SESSION["generatedSid"] = NULL;
-                    
-                    $jresp['message'] = $row['PSW'];
+                $sql = $conn->prepare("SELECT Username, Psw FROM Keepass WHERE Session_Id = :Session_Id AND (Username IS NOT NULL OR Psw IS NOT NULL)");
+                    $sql->bindParam(":Session_Id", $sid);
+                $sql->execute();
+                $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                if ($result && count($result) == 1) {
+                    $_SESSION['generatedSid'] = NULL;
+                    $jresp['username'] = $result[0]['Username'];
+                    $jresp['password'] = $result[0]['Psw'];
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error fetching password (4)";
+                    $jresp['message'] = "Error(2): Error fetching credentials";
                 }
-    
-                $conn->close();	
+                $conn = null;
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(2): Invalid sid provided";
         }
-        
         
         return json_encode($jresp);
     }
     
     static public function removeEntry($sid) {
         $jresp['status'] = FALSE;
-        
         $inputok = KeeLink::validateMD5($sid);
 
         if($inputok) {
             if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-                $jresp['message'] = "Invalid parameter passed (7)";
+                $jresp['message'] = "Error(3): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
+                $sql = $conn->prepare("DELETE FROM Keepass WHERE Session_Id = :Session_Id");
+                    $sql->bindParam(":Session_Id", $sid);
                 
-                $sql = "delete from KEEPASS where SESSION_ID='".$sid."'";
-                
-                if ($conn->query($sql) === TRUE) {
+                if ($sql->execute() === TRUE) {
                     $jresp['message'] = "OK";
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error fetching password (8)";
+                    $jresp['message'] = "SQL Error(3): Error removing entry";
                 }
-    
-                $conn->close();	
+                $conn = null;	
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(3): Invalid sid provided";
         }
         
         return json_encode($jresp);
     }
     
-    static public function setPasswordForSid($sid,$psw) {
+    static public function setCredentialsForSid($sid,$username,$psw) {
         $jresp['status'] = FALSE;
         
         $inputok = KeeLink::validateMD5($sid);
 
         if($inputok) {
-            if($sid === NULL || $psw === NULL) {
-                $jresp['message'] = "Invalid parameter passed (5)";
+            if($sid === NULL || $username === NULL || $psw === NULL) {
+                $jresp['message'] = "Error(4): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
+                $sql = $conn->prepare("UPDATE Keepass SET Username = :Username, Psw = :Psw WHERE Session_Id = :Session_Id AND Username IS NULL AND Psw IS NULL");
+                    $sql->bindParam(":Username", $conn->real_escape_string($username));
+                    $sql->bindParam(":Psw", $conn->real_escape_string($psw));
+                    $sql->bindParam(":Session_Id", $sid);
                 
-                $sql = "update KEEPASS set PSW ='".$conn->real_escape_string($psw)."' where SESSION_ID='".$sid."' and PSW is null";
-                
-                if (($conn->query($sql) === TRUE) && ($conn->affected_rows == 1)) {
+                if (($sql->execute() === TRUE) && ($sql->rowCount() == 1)) {
                     $jresp['message'] = "OK";
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "SQL Error (6): ".mysqli_error($conn);
+                    error_log($sqlInsertSID->errorInfo()[2]);
+                    $jresp['message'] = "SQL Error (4): ".$sql->errorCode();
                 }
-    
-                $conn->close();
+                $conn = null;
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(4): Invalid sid provided";
         }
         
         return json_encode($jresp);
@@ -145,34 +141,30 @@ class KeeLink {
 
     static public function getPublicKeyForSid($sid) {
         $jresp['status'] = FALSE;
-        
         $inputok = KeeLink::validateMD5($sid);
 
         if($inputok) {
             if($sid === NULL && $_SESSION['generatedSid'] != $sid) {
-                $jresp['message'] = "Invalid parameter passed (2)";
+                $jresp['message'] = "Error(5): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
+                $sql = $conn->prepare("SELECT PublicKey FROM Keepass WHERE Session_Id = :Session_Id");
+                    $sql->bindParam(":Session_Id", $sid);
+                $sql->execute();
+                $result = $sql->fetchAll(PDO::FETCH_ASSOC);
                 
-                $sql = "select PUBLIC_KEY from KEEPASS where SESSION_ID='".$sid."'";
-                $result = $conn->query($sql);
-                
-                if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    
-                    $jresp['message'] = $row['PUBLIC_KEY'];
+                if ($result && count($result) == 1) {                   
+                    $jresp['message'] = $result[0]['Public_Key'];
                     $jresp['status'] = TRUE;
                 } else {
-                    $jresp['message'] = "Error fetching public key (4)";
+                    $jresp['message'] = "Error(5): Error fetching public key";
                 }
-    
-                $conn->close();	
+                $conn = null;
             }
         } else {
-            $jresp['message'] = "Invalid sid passed (1)";
+            $jresp['message'] = "Error(5): Invalid sid provided";
         }
-        
-        
+
         return json_encode($jresp);
     }
 
@@ -180,28 +172,36 @@ class KeeLink {
         $jresp['status'] = TRUE;
 
         $conn = KeeLink::getConnection();
-        $sql = "delete from KEEPASS where PSW is not null";
-        $result = $conn->query($sql);
+        $result = $conn->exec("DELETE FROM Keepass WHERE Psw IS NOT NULL");
 
-        $jresp['message'] = "Removed ".$conn->affected_rows." old record/s";
-
+        $jresp['message'] = "Removed ".$result." old record/s";
+        
+        $conn = null;
         return json_encode($jresp);
     }
     
-    static private function needChapta($conn) {
-        $sqlAccessAttempt = "select SID_CREATED from USER where USER_ID='".$_SERVER['REMOTE_ADDR']."'";
-        $result = $conn->query($sqlAccessAttempt);
-        if ($result->num_rows == 1) {
-            $attempts = $result->fetch_assoc()["SID_CREATED"];
-            if($attempts > 5)
-                return TRUE;
-        } 
+    static private function needCaptcha($conn) {
+        $sql = $conn->prepare("SELECT * FROM User WHERE User_Id = :User_Id");
+            $sql->bindValue(":User_Id", $_SERVER['REMOTE_ADDR']);
+        $sql->execute();
+        $result = $sql->fetchAll(PDO::FETCH_ASSOC);
+        if ($result && count($result) == 1) {
+            if($result[0]["Sid_Created"] > 4) {
+                if(strtotime($result[0]["Last_Access"]) > strtotime("-10 minutes")) {
+                    return TRUE;
+                } else {
+                    $sqlReset = $conn->prepare("UPDATE User SET Sid_Created=1, Last_Access=CURRENT_TIMESTAMP WHERE User_Id = :User_Id");
+                        $sql->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
+                    $sqlReset->execute();
+                }
+            }
+        }
         
         return FALSE;
     }
     
     static private function generateSid() {
-        if($_SESSION["generatedSid"] == NULL)
+        if(!isset($_SESSION["generatedSid"]) or $_SESSION["generatedSid"] == NULL)
             $_SESSION["generatedSid"] = hash("md5",openssl_random_pseudo_bytes(256));
         
         return $_SESSION["generatedSid"];
@@ -216,20 +216,56 @@ class KeeLink {
     }
     
     static private function getConnection() {
-        // Create connection
-        $CONFIG_INI = parse_ini_file('private/config.ini');
+        $isMySql = file_exists("private/config.ini");
+        $dbSqliteExists = file_exists("private/KeeLink.db");
         
-        if($CONFIG_INI == FALSE) {
-            error_log("Configuration file not found");
-            die;
+        try
+        {
+            if($isMySql) {
+                $CONFIG_INI = parse_ini_file("private/config.ini");
+                if($CONFIG_INI == FALSE) {
+                    error_log("MySQL configuration file not found!");
+                    die;
+                }
+            $conn = new PDO("mysql:host=" . $CONFIG_INI['host'] . ";port=" . $CONFIG_INI['port'] . ";dbname=" . $CONFIG_INI['dbname'] . ";charset=utf8", $CONFIG_INI['username'], $CONFIG_INI['password']); 
+            } else {
+                //SQLite
+                $conn = new PDO("sqlite:private/KeeLink.db");
+            }
+        }
+        catch(PDOException $e)
+        {
+            error_log($e->getMessage());
+            die('Exception: unable to open Database!');
         }
         
-        $conn = new mysqli($CONFIG_INI['host'], $CONFIG_INI['username'], $CONFIG_INI['password'], $CONFIG_INI['dbname'],$CONFIG_INI['port']) or die("Error: ".mysqli_error($conn));
-        $conn->set_charset("utf8");
-        
+        //Create SQLite DB if not exists
+        if (!$isMySql and !$dbSqliteExists) {
+            try
+            {
+                $conn -> exec ("CREATE TABLE IF NOT EXISTS [User] (
+                                User_Id TEXT PRIMARY KEY NOT NULL,
+                                Last_Access DATETIME DEFAULT (CURRENT_TIMESTAMP),
+                                Sid_Created INTEGER NOT NULL DEFAULT (1) 
+                            );");
+                $conn -> exec ("CREATE TABLE IF NOT EXISTS [Keepass] (
+                                Session_Id TEXT NOT NULL PRIMARY KEY,
+                                Username TEXT,
+                                Psw TEXT,
+                                Creation_Date DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL,
+                                User_Id TEXT NOT NULL,
+                                Public_Key TEXT NOT NULL,
+                                FOREIGN KEY (User_Id) REFERENCES User (User_Id)
+                            );");
+                $conn -> exec ("PRAGMA encoding = 'UTF-8';");  
+            }
+            catch(PDOException $e)
+            {
+                error_log($e->getMessage());
+                die('Exception: unable to create SQlite DB!');
+            }
+        }
         return $conn;
     }
-
 }
-
 ?>

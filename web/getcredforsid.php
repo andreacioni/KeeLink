@@ -3,7 +3,7 @@
 	
 	if(isset($_GET['sid'])) {
 		$sid = $_GET['sid'];
-		echo KeeLink::getPublicKeyForSid($sid);
+		echo KeeLink::getCredentialsForSid($sid);
 	} else {
 		$jresp['status'] = false;
 		$jresp['message'] = "Invalid Sid!";
