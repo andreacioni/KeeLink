@@ -15,13 +15,13 @@ class KeeLink {
         $jresp['status'] = false;
         $sid = KeeLink::generateSid();
         $inputok = KeeLink::validateBase64Input($publickey);
-        $jresp['captchaRequired'] = FALSE;//TODO KeeLink::needCaptcha($conn);
+        $conn = KeeLink::getConnection();
+        $jresp['captchaRequired'] = KeeLink::needCaptcha($conn);
 
         if($inputok) {
             if($jresp['captchaRequired'] === TRUE) {
-                $jresp['message'] = "Error(1): Captcha required";
+                $jresp['message'] = "Too many connections from your address, please try again later!";
             } else {
-                $conn = KeeLink::getConnection();
                 $sqlInserUser = $conn->prepare("REPLACE INTO User (User_Id, Last_Access, Sid_Created) VALUES (:User_Id, CURRENT_TIMESTAMP, IFNULL((SELECT COUNT (User_Id) FROM User WHERE User_Id = :User_Id), 0) + 1)");
                     $sqlInserUser->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
                 $sqlInsertSID = $conn->prepare("REPLACE INTO Keepass (Session_Id, User_Id, Public_Key) VALUES (:Session_Id, :User_Id, :Public_Key)");
@@ -181,16 +181,21 @@ class KeeLink {
     }
     
     static private function needCaptcha($conn) {
-        $sql = $conn->prepare("SELECT Sid_Created FROM User WHERE User_Id = :User_Id");
-            $sql->bindParam(":UserId", $_SERVER['REMOTE_ADDR']);
+        $sql = $conn->prepare("SELECT * FROM User WHERE User_Id = :User_Id");
+            $sql->bindValue(":User_Id", $_SERVER['REMOTE_ADDR']);
         $sql->execute();
         $result = $sql->fetchAll(PDO::FETCH_ASSOC);
-        
         if ($result && count($result) == 1) {
-            $attempts = $result[0]["Sid_Created"];
-            if($attempts > 5)
-                return TRUE;
-        } 
+            if($result[0]["Sid_Created"] > 4) {
+                if(strtotime($result[0]["Last_Access"]) > strtotime("-10 minutes")) {
+                    return TRUE;
+                } else {
+                    $sqlReset = $conn->prepare("UPDATE User SET Sid_Created=1, Last_Access=CURRENT_TIMESTAMP WHERE User_Id = :User_Id");
+                        $sql->bindParam(":User_Id", $_SERVER['REMOTE_ADDR']);
+                    $sqlReset->execute();
+                }
+            }
+        }
         
         return FALSE;
     }
