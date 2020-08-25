@@ -125,21 +125,25 @@ function passwordLooker() {
 }
 
 function initClipboardButtons(username,password) {
-	$("#copyUserBtn").show();
-	$("#copyPswBtn").show();
+	
+	if(username !== undefined && username !== null) {
+		$("#copyUserBtn").show();
+		$("#copyUserBtn,.swal-button").attr("data-clipboard-text",username);
+		
+		//Copy username to clipboard button
+		var clipCopyUser = new ClipboardJS('#copyUserBtn,.swal-button');
+		clipCopyUser.on('success', function() {
+			remindDelete();
+		});
+	}
+
+	$("#copyPassBtn").show();
 	$("#clearBtn").show();
 	
-	$("#copyUserBtn,.swal-button").attr("data-clipboard-text",username);
-	$("#copyPswBtn,.swal-button").attr("data-clipboard-text",password);
-	
-	//Copy username to clipboard button
-	var clipCopyUser = new ClipboardJS('#copyUserBtn,.swal-button');
-	clipCopyUser.on('success', function() {
-		remindDelete();
-	});
+	$("#copyPassBtn,.swal-button").attr("data-clipboard-text",password);
 	
 	//Copy password to clipboard button
-	var clipCopyPsw = new ClipboardJS('#copyPswBtn,.swal-button');
+	var clipCopyPsw = new ClipboardJS('#copyPassBtn,.swal-button');
 	clipCopyPsw.on('success', function() {
 		remindDelete();
 	});
@@ -234,18 +238,26 @@ function remindDelete() {
 
 function onSuccess(data,textStatus,jqXhr) {
 	if(data != undefined && data.status === true) {
-		log("Encoded username: " + data.username);
-		data.username = fromSafeBase64(data.username);
-		log("Decoded username: " + data.username);
-		decryptedUsername = _crypt.decrypt(data.username);
+		let decryptedUsername, decryptedPsw;
+
+		if(data.username === undefined || data.username === null) {
+			log("Username was not received")
+		} else {
+			log("Encoded username: " + data.username);
+			data.username = fromSafeBase64(data.username);
+			log("Decoded username: " + data.username);
+			decryptedUsername = _crypt.decrypt(data.username);
+			log("Decrypted username: " + decryptedUsername);
+		}
+		
 		log("Encoded password: " + data.password);
 		data.password = fromSafeBase64(data.password);
 		log("Decoded password: " + data.password);
 		decryptedPsw = _crypt.decrypt(data.password);
-		if(decryptedUsername && decryptedPsw) {
-			log("Decrypted username: " + decryptedUsername);
-			log("Decrypted password: " + decryptedPsw);
-			alertSuccess("Credentials received!","Would you copy password on clipboard? (Also remember to clear your clipboard after usage!)");
+		log("Decrypted password: " + decryptedPsw);
+		
+		if(decryptedPsw) { //Username is not required for next steps
+			alertSuccess("Credentials received!","Would you copy your password on clipboard? (Also remember to clear your clipboard after usage!)");
 			initClipboardButtons(decryptedUsername, decryptedPsw);
 			$.post("removeentry.php",{'sid':_sid},function(){},"json");
 			invalidateSession();

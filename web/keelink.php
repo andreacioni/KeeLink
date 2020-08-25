@@ -114,21 +114,21 @@ class KeeLink {
         $inputok = KeeLink::validateMD5($sid);
 
         if($inputok) {
-            if($sid === NULL || $username === NULL || $psw === NULL) {
+            if($sid === NULL || $psw === NULL) {
                 $jresp['message'] = "Error(4): Invalid parameter provided";
             } else {
                 $conn = KeeLink::getConnection();
                 $sql = $conn->prepare("UPDATE Keepass SET Username = :Username, Psw = :Psw WHERE SessionId = :SessionId AND Username IS NULL AND Psw IS NULL");
-                    $sql->bindValue(":Username", $conn->real_escape_string($username));
-                    $sql->bindValue(":Psw", $conn->real_escape_string($psw));
+                    $sql->bindValue(":Username", $username);
+                    $sql->bindValue(":Psw", $psw);
                     $sql->bindValue(":SessionId", $sid);
                 
                 if (($sql->execute() === TRUE) && ($sql->rowCount() == 1)) {
                     $jresp['message'] = "OK";
                     $jresp['status'] = TRUE;
                 } else {
-                    error_log($sqlInsertSID->errorInfo()[2]);
-                    $jresp['message'] = "SQL Error (4): ".$sql->errorCode();
+                    error_log($sql->errorInfo()[2]);
+                    $jresp['message'] = "Error (4): Unknown or already used session ID - ".$sql->errorCode();
                 }
                 $conn = null;
             }
