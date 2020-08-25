@@ -1,9 +1,9 @@
 <?php
-	require('keelink.php');
+    require('keelink.php');
 	
 	if(isset($_GET['sid'])) {
 		$sid = $_GET['sid'];
-		echo KeeLink::getCredentialsForSid($sid);
+		echo KeeLink::getPasswordForSid($sid);
 	} else {
 		$jresp['status'] = false;
 		$jresp['message'] = "Invalid Sid!";
