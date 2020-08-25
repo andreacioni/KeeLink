@@ -14,5 +14,6 @@ CREATE TABLE Keepass (
   CreationDate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UserId varchar(255) NOT NULL,
   PublicKey varchar(512) NOT NULL,
-  FOREIGN KEY (UserId) REFERENCES USER(UserId)
+  INDEX (UserId),
+  FOREIGN KEY (UserId) REFERENCES Users(UserId)
 ) ENGINE=MyISAM DEFAULT CHARSET utf8;
