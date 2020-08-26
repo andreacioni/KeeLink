@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import it.andreacioni.kp2a.plugin.keelink.asynctask.AsyncPostTask;
+import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
 
 /**
  * Created by andreacioni on 19/05/16.
@@ -21,7 +22,7 @@ public class KeeLink {
 
     public void sendKey(String sid, String key, AsyncPostTask.AsyncPostResponse response) {
         AsyncPostTask post = new AsyncPostTask(ctx,response);
-        post.execute(KeelinkDefs.TARGET_SITE, sid, key);
+        post.execute(KeelinkPreferences.getString(ctx, KeelinkPreferences.HOSTNAME), sid, key);
     }
 
     public boolean checkNetworkConnection() {

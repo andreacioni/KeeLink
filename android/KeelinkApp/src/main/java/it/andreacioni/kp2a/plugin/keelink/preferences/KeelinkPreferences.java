@@ -2,13 +2,11 @@ package it.andreacioni.kp2a.plugin.keelink.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeelinkDefs;
 
 /**
@@ -25,6 +23,7 @@ public class KeelinkPreferences {
     public static final String RECENT_PREFERENCES_ENTRY = "recentHistory"; //String
     public static final String FLAG_FAST_TIMEOUT = "fastSend"; //Long
     public static final String FLAG_FAST_ENABLE= "fastSendEnable"; //Boolean
+    public static final String HOSTNAME = "hostname"; //String
 
     /*
         Following maps are used to set default value when querying value from preferences.
@@ -41,6 +40,7 @@ public class KeelinkPreferences {
 
         Map<String, String> tempString = new HashMap<>();
         tempString.put(RECENT_PREFERENCES_ENTRY, "[]");
+        tempString.put(HOSTNAME, KeelinkDefs.DEFAULT_TARGET_SITE);
         DEFAULT_STRING_VALUES = Collections.unmodifiableMap(tempString);
 
         Map<String, Long> tempLong = new HashMap<>();

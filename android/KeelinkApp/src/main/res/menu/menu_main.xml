@@ -10,6 +10,9 @@
         app:showAsAction="ifRoom"
         app:actionLayout="@layout/toolbar_items" />
 
+    <item android:id="@+id/hostname_selection"
+        android:title="@string/choose_hostname"/>
+
     <item android:id="@+id/fast_flag"
         android:title="@string/action_settings"
         android:checkable="true"/>

@@ -1,6 +1,7 @@
 package it.andreacioni.kp2a.plugin.keelink.activity;
 
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -8,18 +9,22 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -40,6 +45,7 @@ import it.andreacioni.kp2a.plugin.keelink.keelink.KeelinkDefs;
 import it.andreacioni.kp2a.plugin.keelink.R;
 import it.andreacioni.kp2a.plugin.keelink.asynctask.RecentActivityLoader;
 import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
+import it.andreacioni.kp2a.plugin.keelink.validators.HostnameTextValidator;
 import keepass2android.pluginsdk.AccessManager;
 import keepass2android.pluginsdk.KeepassDefs;
 import keepass2android.pluginsdk.Kp2aControl;
@@ -82,7 +88,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     Log.i(TAG,"Password received from intent!");
 
                     try {
-                        passwordReceived = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA)).getString(KeepassDefs.PasswordField);
+                        JSONObject jsonObject = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
+                        passwordReceived = jsonObject.getString(KeepassDefs.PasswordField);
                     } catch (JSONException e) {
                         Log.e(TAG, "Password parsing error" + e.getMessage());
                     }
@@ -176,8 +183,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                         enableDisablePlugin();
                     }
                 });
-            } else
+            } else {
                 switchh.setChecked(false);
+            }
+
+            MenuItem chooseHost = m.findItem(R.id.hostname_selection);
+            chooseHost.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    openHostSelectionPopup();
+                    return true;
+                }
+            });
 
             if(KeelinkPreferences.getBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE)) {
                 MenuItem item = m.findItem(R.id.fast_flag);
@@ -217,13 +234,13 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     .show();
                 break;
             case R.id.howto:
-                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=howto&onlyinfo=true");
+                openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/?show=howto&onlyinfo=true");
                 break;
             case R.id.about:
-                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/?show=credits&onlyinfo=true");
+                openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/?show=credits&onlyinfo=true");
                 break;
             case R.id.privacy:
-                openBrowserWithUrl(KeelinkDefs.TARGET_SITE + "/privacy-policy.html");
+                openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/privacy-policy.html");
                 break;
             default:
                 Log.w(TAG,"Not a valid ID");
@@ -247,6 +264,52 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         }
 
         return true;
+    }
+
+    private void openHostSelectionPopup() {
+        String hostName = KeelinkPreferences.getString(this, KeelinkPreferences.HOSTNAME);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.choose_hostname_message)
+                .setTitle(R.string.choose_hostname);
+        builder.setCancelable(true);
+
+        LayoutInflater inflater = getLayoutInflater();
+        View inflated = inflater.inflate(R.layout.dialog_hostname_selection, null);
+        builder.setView(inflated);
+
+        final EditText editText = inflated.findViewById(R.id.hostname_selection_edit_text);
+        editText.setText(hostName);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                KeelinkPreferences.setString(MainActivity.this, KeelinkPreferences.HOSTNAME, editText.getText().toString());
+            }
+        });
+        builder.setNeutralButton("Use default", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                KeelinkPreferences.setString(MainActivity.this, KeelinkPreferences.HOSTNAME, KeelinkDefs.DEFAULT_TARGET_SITE);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        final AlertDialog dialog = builder.create();
+
+        editText.addTextChangedListener(new HostnameTextValidator(editText) {
+            @Override
+            public void onValidationResultChange(boolean isValid) {
+                Button positiveButton = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                positiveButton.setEnabled(isValid);
+            }
+        });
+
+        dialog.show();
     }
 
     private boolean snackStatusShow() {

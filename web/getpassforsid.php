@@ -1,7 +1,12 @@
 <?php
-	require('keelink.php');
-	$sid = $_GET["sid"];
+    require('keelink.php');
 	
-	echo KeeLink::getPasswordForSid($sid);
-
+	if(isset($_GET['sid'])) {
+		$sid = $_GET['sid'];
+		echo KeeLink::getPasswordForSid($sid);
+	} else {
+		$jresp['status'] = false;
+		$jresp['message'] = "Invalid Sid!";
+		echo json_encode($jresp);
+	}
 ?>
