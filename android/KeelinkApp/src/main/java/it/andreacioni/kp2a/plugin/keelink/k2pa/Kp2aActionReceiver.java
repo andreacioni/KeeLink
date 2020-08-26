@@ -55,7 +55,7 @@ public class Kp2aActionReceiver extends PluginActionBroadcastReceiver {
 
         i.putExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA, new JSONObject(actionSelected.getEntryFields()).toString());
         i.putExtra(Strings.EXTRA_ENTRY_ID,actionSelected.getEntryId());
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         actionSelected.getContext().startActivity(i);
 
