@@ -5,14 +5,11 @@
 
 <p align="center"><i>a Keepass2Android Plug-In</i></p>
 
-
-<p>More info and <b>online service</b> => <a href="https://keelink.cloud?onlyinfo=true">https://keelink.cloud</a></p>
-
 More info and **online service** => [https://keelink.cloud](https://keelink.cloud?onlyinfo=true)
 
 ---
 
-**HOW TO SELFHOST** (Requirements: PHP and SQLITE or MYSQL):
+**HOW TO SELFHOST** (Requirements: PHP and SQLITE or MYSQL)
 * Copy the content of the `web` folder on your webserver</li>
 * By default it starts with SQLite (it's enough for few users)</li>
 * In order to switch to MySQL (for many users):
