@@ -1,12 +1,15 @@
 package it.andreacioni.kp2a.plugin.keelink.activity;
 
+import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
@@ -59,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
     private static final int START_KEEPASS_CODE = 399;
 
     private String passwordReceived = null;
+    private String usernameReceived = null;
+
     private KeeLink keeLink = new KeeLink(this);
 
     private Map<String, String> selected = null;
@@ -90,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                     try {
                         JSONObject jsonObject = new JSONObject(i.getStringExtra(Strings.EXTRA_ENTRY_OUTPUT_DATA));
                         passwordReceived = jsonObject.getString(KeepassDefs.PasswordField);
+                        usernameReceived = jsonObject.getString(KeepassDefs.UserNameField);
                     } catch (JSONException e) {
                         Log.e(TAG, "Password parsing error" + e.getMessage());
                     }
@@ -324,8 +330,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 if (!KeeLink.checkNetworkConnection(this))
                     Snackbar.make(fab, "No network connection", Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
                 else {
-                    Snackbar.make(fab, "Ready!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
-                    ret = true;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+                        Snackbar.make(fab, "No 'Draw Over Other Apps' permission given", Snackbar.LENGTH_INDEFINITE).setAction("Change", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                                startActivityForResult(intent, 0);
+                            }
+                        }).show();
+                    } else {
+                        Snackbar.make(fab, "Ready!", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+                        ret = true;
+                    }
                 }
             }
         } else {
@@ -485,7 +501,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 if (content.startsWith(KeeLink.QR_CODE_PREFIX)) {
                     content = content.substring(KeeLink.QR_CODE_PREFIX.length());
                     Log.d(TAG, "Valid code scanned:" + content);
-                    validSidReceived(content, passwordReceived);
+                    validSidReceived(content);
                 } else {
                     Log.e(TAG, "Invalid code:" + content);
                     new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
@@ -500,6 +516,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         }
 
         passwordReceived = null;
+        usernameReceived = null;
 
     }
 
@@ -515,27 +532,33 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         selected = null;
     }
 
-    private void validSidReceived(String sid, String password) {
+    private void validSidReceived(String sid) {
+
+        AsyncPostResponse responseCallback = new AsyncPostResponse() {
+            @Override
+            public void response(boolean result) {
+                if (result) {
+                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
+                            .setTitleText("OK")
+                            .setContentText("Password was sent, wait the arriving on your page!")
+                            .show();
+                }
+                else {
+                    new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
+                            .setTitleText("Error")
+                            .setContentText("There was an error communicating with the server, try again.")
+                            .show();
+                }
+
+            }
+        };
 
         if (snackStatusShow()) {
-            keeLink.sendKey(sid, password, new AsyncPostResponse() {
-                @Override
-                public void response(boolean result) {
-                    if (result) {
-                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.SUCCESS_TYPE)
-                                .setTitleText("OK")
-                                .setContentText("Password was sent, wait the arriving on your page!")
-                                .show();
-                    }
-                    else {
-                        new SweetAlertDialog(MainActivity.this, SweetAlertDialog.ERROR_TYPE)
-                                .setTitleText("Error")
-                                .setContentText("There was an error communicating with the server, try again.")
-                                .show();
-                    }
-
-                }
-            });
+            if(usernameReceived.trim().isEmpty()) {
+                keeLink.sendPassword(sid, passwordReceived, responseCallback);
+            } else {
+                keeLink.sendUsernameAndPassword(sid, usernameReceived, passwordReceived, responseCallback);
+            }
         }
 
     }

@@ -20,9 +20,12 @@ public class KeeLink {
         this.ctx = ctx;
     }
 
-    public void sendKey(String sid, String key, AsyncPostTask.AsyncPostResponse response) {
-        AsyncPostTask post = new AsyncPostTask(ctx,response);
-        post.execute(KeelinkPreferences.getString(ctx, KeelinkPreferences.HOSTNAME), sid, key);
+    public void sendPassword(String sid, String password, AsyncPostTask.AsyncPostResponse responseCallback) {
+        new AsyncPostTask(ctx, responseCallback).execute(sid, password);
+    }
+
+    public void sendUsernameAndPassword(String sid, String username, String password, AsyncPostTask.AsyncPostResponse responseCallback) {
+        new AsyncPostTask(ctx, responseCallback).execute(sid, password, username);
     }
 
     public boolean checkNetworkConnection() {

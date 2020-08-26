@@ -26,6 +26,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import it.andreacioni.kp2a.plugin.keelink.keelink.KeeLinkUtils;
+import it.andreacioni.kp2a.plugin.keelink.preferences.KeelinkPreferences;
 
 /**
  * Created by andreacioni on 21/05/16.
@@ -36,12 +37,15 @@ public class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
 
     private static final String USER_AGENT = "Mozilla/5.0";
 
-    private ProgressDialog dialog = null;
+    private final String targetSite;
 
-    private AsyncPostResponse responseCallback = null;
+    private ProgressDialog dialog;
+
+    private AsyncPostResponse responseCallback;
 
     public AsyncPostTask(Context ctx,AsyncPostResponse r) {
-        this.dialog = KeeLinkUtils.setupProgressDialog(ctx);
+        targetSite = KeelinkPreferences.getString(ctx, KeelinkPreferences.HOSTNAME);
+        dialog = KeeLinkUtils.setupProgressDialog(ctx);
         responseCallback = r;
     }
 
@@ -53,12 +57,23 @@ public class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
     @Override
     protected Boolean doInBackground(String... params) {
         boolean ret = false;
-        if(params == null || params.length != 3 ) {
+        if(params == null || (params.length != 2  && params.length != 3)) {
             Log.e(this.getClass().getSimpleName(),"Invalid params passed");
         } else {
             try {
-                String encryptedKey = encryptKey(params[0], params[1], params[2]);
-                sendKey(params[0], params[1], encryptedKey);
+                String sid = params[0];
+                String encryptedUsername = null;
+                String encryptedPassword = encryptString(getPublicKey(params[0]), params[1]);
+
+                if(params.length == 3) {
+                    Log.i(TAG, "Sending username & password");
+                    encryptedUsername = encryptString(getPublicKey(params[0]), params[2]);
+                    sendUsernameAndPassword(sid, encryptedUsername, encryptedPassword);
+                } else {
+                    Log.i(TAG, "Sending password");
+                    sendPassword(sid, encryptedPassword);
+                }
+
                 ret = true;
             } catch (IOException e) {
                 Log.e(TAG, "IO exception on connection to remote server", e);
@@ -90,19 +105,23 @@ public class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
         dialog.dismiss();
     }
 
-    private String encryptKey(String targetSite,String sid,String key) throws IOException, NullPointerException, JSONException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
-        Log.d(TAG, "Getting public key from remote");
-
-        String publicKeyString = sendHTTPRequest("GET", targetSite + "/getpublickey.php?sid=" + sid, null);
-        PublicKey publicKey = KeeLinkUtils.buildPublicKeyFromBase64String(publicKeyString);
-        Log.d(TAG, publicKey.toString());
+    private String encryptString(PublicKey publicKey, String key) throws IOException, NullPointerException, JSONException, NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         key = KeeLinkUtils.encrypt(publicKey, key); //key is now in base64 mode
 
         return key;
 
     }
 
-    private void sendKey(String targetSite,String sid,String key) throws IOException, NullPointerException, JSONException {
+    private PublicKey getPublicKey(String sid) throws IOException, JSONException, InvalidKeySpecException, NoSuchAlgorithmException {
+        Log.d(TAG, "Getting public key from remote");
+
+        String publicKeyString = sendHTTPRequest("GET", targetSite + "/getpublickey.php?sid=" + sid, null);
+        PublicKey publicKey = KeeLinkUtils.buildPublicKeyFromBase64String(publicKeyString);
+        Log.d(TAG, publicKey.toString());
+        return publicKey;
+    }
+
+    private void sendPassword(String sid, String key) throws IOException, NullPointerException, JSONException {
         Log.d(TAG, "Sending key to remote");
 
         Map<String, String> parameters = new HashMap<>();
@@ -110,6 +129,17 @@ public class AsyncPostTask extends AsyncTask<String,Integer,Boolean> {
         parameters.put("key", key);
 
         sendHTTPRequest("POST", targetSite + "/updatepsw.php", parameters);
+    }
+
+    private void sendUsernameAndPassword(String sid, String username, String password) throws IOException, NullPointerException, JSONException {
+        Log.d(TAG, "Sending credentaials to remote");
+
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("sid", sid);
+        parameters.put("username", username);
+        parameters.put("password", password);
+
+        sendHTTPRequest("POST", targetSite + "/updatecred.php", parameters);
     }
 
     private String sendHTTPRequest(String method, String url, Map<String, String> postParameters) throws IOException, NullPointerException, JSONException {
