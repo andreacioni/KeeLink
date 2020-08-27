@@ -9,6 +9,7 @@ import it.andreacioni.kp2a.plugin.keelink.keelink.KeelinkDefs;
 
 public abstract class HostnameTextValidator implements TextWatcher {
     private static  final String HTTP_HOST_PORT_REGEX = "^https?://([a-zA-Z0-9-_]+\\.)*[a-zA-Z0-9][a-zA-Z0-9-_]+\\.[a-zA-Z]{2,11}?(:[0-9]{1,5})?$";
+    private static  final String HTTP_IP_PORT_REGEX = "^https?://((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\.)){3}((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(:[0-9]{1,5})?$";
 
     private final EditText editText;
 
@@ -17,7 +18,7 @@ public abstract class HostnameTextValidator implements TextWatcher {
     }
 
     public void validate(EditText editText, String text) {
-        if(!text.matches(HTTP_HOST_PORT_REGEX)) {
+        if(!text.matches(HTTP_HOST_PORT_REGEX) && !text.matches(HTTP_IP_PORT_REGEX)) {
             editText.setError("http[s]://<host>[:<port>]");
             onValidationResultChange(false);
         } else {
