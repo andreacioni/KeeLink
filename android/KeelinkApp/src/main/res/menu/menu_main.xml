@@ -11,7 +11,8 @@
         app:actionLayout="@layout/toolbar_items" />
 
     <item android:id="@+id/hostname_selection"
-        android:title="@string/choose_hostname"/>
+        android:title="@string/choose_hostname"
+        android:checkable="true"/>
 
     <item android:id="@+id/send_username"
         android:title="@string/send_username"/>
