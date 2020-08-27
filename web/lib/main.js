@@ -143,6 +143,7 @@ function initClipboardButtons(username,password,copyPassword) {
 
 	$("#copyPassBtn").show();
 	$("#clearBtn").show();
+	$("#reloadBtn").show();
 	
 	$("#copyPassBtn").attr("data-clipboard-text",password);
 	
@@ -228,7 +229,7 @@ function alertWarnReload(title,msg) {
 	button: "Reload",
 	}).then((value)=>{
 		if(value)
-			location.reload();
+			refreshPage();
 	});
 }
 
@@ -314,6 +315,10 @@ function invalidateSession() {
 	$("#qrcode").css("filter", "blur(2px)");
 	$("#qrcode").css("-webkit-filter", "blur(2px)");
 }
+
+function refreshPage(){
+    window.location.reload();
+} 
 
 function PEMtoBase64(pem) {
 	return pem.replace(new RegExp("\\n","g"), "").replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "");
