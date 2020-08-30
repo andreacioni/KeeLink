@@ -24,6 +24,7 @@ public class KeelinkPreferences {
     public static final String FLAG_FAST_TIMEOUT = "fastSend"; //Long
     public static final String FLAG_FAST_ENABLE= "fastSendEnable"; //Boolean
     public static final String HOSTNAME = "hostname"; //String
+    public static final String SEND_USERNAME_ENABLED = "sendUsername"; //Boolean
 
     /*
         Following maps are used to set default value when querying value from preferences.
@@ -36,6 +37,7 @@ public class KeelinkPreferences {
     static {
         Map<String, Boolean> tempBoolean = new HashMap<>();
         tempBoolean.put(FLAG_FAST_ENABLE, false);
+        tempBoolean.put(SEND_USERNAME_ENABLED, false);
         DEFAULT_BOOLEAN_VALUES = Collections.unmodifiableMap(tempBoolean);
 
         Map<String, String> tempString = new HashMap<>();

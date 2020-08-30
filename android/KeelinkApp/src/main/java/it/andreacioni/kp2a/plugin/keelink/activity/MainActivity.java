@@ -193,14 +193,10 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 switchh.setChecked(false);
             }
 
-            MenuItem chooseHost = m.findItem(R.id.hostname_selection);
-            chooseHost.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    openHostSelectionPopup();
-                    return true;
-                }
-            });
+            if(KeelinkPreferences.getBoolean(getApplicationContext(), KeelinkPreferences.SEND_USERNAME_ENABLED)) {
+                MenuItem item = m.findItem(R.id.send_username);
+                item.setChecked(true);
+            }
 
             if(KeelinkPreferences.getBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE)) {
                 MenuItem item = m.findItem(R.id.fast_flag);
@@ -232,6 +228,18 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
                 }
 
                 KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE, item.isChecked());
+                break;
+            case R.id.hostname_selection:
+                openHostSelectionPopup();
+                break;
+            case R.id.send_username:
+                if(item.isChecked()) {
+                    item.setChecked(false);
+                } else {
+                    item.setChecked(true);
+                }
+
+                KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.SEND_USERNAME_ENABLED, item.isChecked());
                 break;
             case R.id.go_online:
                 new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
@@ -554,7 +562,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         };
 
         if (snackStatusShow()) {
-            if(usernameReceived.trim().isEmpty()) {
+            if(usernameReceived.trim().isEmpty() || !KeelinkPreferences.getBoolean(this, KeelinkPreferences.SEND_USERNAME_ENABLED)) {
                 keeLink.sendPassword(sid, passwordReceived, responseCallback);
             } else {
                 keeLink.sendUsernameAndPassword(sid, usernameReceived, passwordReceived, responseCallback);
