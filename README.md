@@ -8,14 +8,11 @@
 More info and **online service** => [https://keelink.cloud](https://keelink.cloud?onlyinfo=true)
 
 ---
+If you are concerned about security and you don't want to share backend services with other people then you should host the web app on your private network.
 
-**HOW TO SELFHOST** (Requirements: PHP and SQLITE or MYSQL)
-* Copy the content of the `web` folder on your webserver</li>
-* By default it starts with SQLite (it's enough for few users)</li>
-* In order to switch to MySQL (for many users):
-    * Copy the file `private/config.default.ini` to `private/config.ini` and edit it with MySQL settings
-    * Manually initialize the MySQL DB (IE with phpMyAdmin) with the file `private/InitMySQL.sql`
-* If you are not using Apache, make sure to deny access to the "private" folder from web because it contains your SQLite DB and your MySQL credentials
+**‼️ BREAKING NEWS ‼️**
+
+By *October 8 2021*, web applications has been migrated from PHP to Golang and MySQL database it's not more needed. This changes unlock more flexibility and allow everyone to build the web app just by compiling the [keelink-service](https://github.com/andreacioni/keelink-service) source code using Golang.
 
 ---
 
