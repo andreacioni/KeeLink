@@ -12,7 +12,7 @@ If you are concerned about security and you don't want to share backend services
 
 **‼️ BREAKING NEWS ‼️**
 
-By *October 8 2021*, web applications has been migrated from PHP to Golang and MySQL database it's not more needed. This changes unlock more flexibility and allow everyone to build the web app just by compiling the [keelink-service](https://github.com/andreacioni/keelink-service) source code using Golang.
+By *October 8 2021*, web applications has been migrated from PHP to Golang and MySQL database it's not more needed. This changes unlock more flexibility and allow everyone to build the web app just by compiling the [keelink-webapp](https://github.com/andreacioni/keelink-webapp) source code using Golang.
 
 ---
 
