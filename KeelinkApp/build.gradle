@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
     buildToolsVersion '28.0.3'
 
     defaultConfig {
         applicationId "it.andreacioni.kp2a.plugin.keelink"
         minSdkVersion 14
-        targetSdkVersion 29
-        versionCode 34
-        versionName "2.1.6"
+        targetSdkVersion 33
+        versionCode 39
+        versionName "2.1.11"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }

@@ -5,7 +5,7 @@
 
 <p align="center"><i>a Keepass2Android Plug-In</i></p>
 
-More info and **online service** => [https://keelink.cloud](https://keelink.cloud?onlyinfo=true)
+More info and **online service** => [https://keelink.fly.dev](https://keelink.fly.dev?onlyinfo=true)
 
 ---
 If you are concerned about security and you don't want to share backend services with other people then you should host the web app on your private network.

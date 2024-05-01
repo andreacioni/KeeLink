@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
             case R.id.go_online:
                 new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
                     .setTitleText("KeeLink")
-                    .setContentText("The other part of this application is placed online on https://keelink.cloud")
+                    .setContentText("The other part of this application is placed online on https://keelink.fly.dev")
                     .show();
                 break;
             case R.id.howto:
@@ -452,6 +452,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         //Check online
         try {
             pm.getPackageInfo("keepass2android.keepass2android", PackageManager.GET_ACTIVITIES);
+
             app_installed = true;
         }
         catch (PackageManager.NameNotFoundException e1) {
