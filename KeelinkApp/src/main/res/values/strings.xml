@@ -17,7 +17,7 @@
     <string name="kp2aplugin_menu_entry">Send</string>
 
     <string name="kp2aplugin_loading_entry">Processing</string>
-    <string name="onlineInfoText">online on https://keelink.cloud</string>
+    <string name="onlineInfoText">online on https://keelink.fly.dev</string>
     <string name="versionPlaceholder">v:1.0.0</string>
     <string name="onlineIconText">Go online</string>
     <string name="choose_hostname_message">Enter the base URL of KeeLink service if you want to use a custom one</string>

@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
 
 public class KeelinkDefs { //TODO remove this class
 
-    public static final String DEFAULT_TARGET_SITE = "https://keelink.cloud";
+    public static final String DEFAULT_TARGET_SITE = "https://keelink.fly.dev";
 
     public static final String TRANSFORMATION_METHOD =  "RSA/ECB/PKCS1Padding";
 
