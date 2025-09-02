@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
     private void prepareMenu(Menu m) {
         if(m != null) {
-            SwitchCompat switchh = (SwitchCompat) ((MenuItemImpl) m.findItem(R.id.menu_item_switch)).getActionView().findViewById(R.id.pluginEnabledSwitch);
+            SwitchCompat switchh = m.findItem(R.id.menu_item_switch).getActionView().findViewById(R.id.pluginEnabledSwitch);
             if(isKeepassInstalled()) {
                 switchh.setEnabled(true);
                 switchh.setChecked(isEnabled());
@@ -219,49 +219,32 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         Log.d(TAG,"onOptionsItemSelected, option ID:" + id);
 
-        switch (id) {
-            case R.id.fast_flag:
-                if(item.isChecked()) {
-                    item.setChecked(false);
-                } else {
-                    item.setChecked(true);
-                }
-
-                KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE, item.isChecked());
-                break;
-            case R.id.hostname_selection:
-                openHostSelectionPopup();
-                break;
-            case R.id.send_username:
-                if(item.isChecked()) {
-                    item.setChecked(false);
-                } else {
-                    item.setChecked(true);
-                }
-
-                KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.SEND_USERNAME_ENABLED, item.isChecked());
-                break;
-            case R.id.go_online:
-                new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
+        if (id == R.id.fast_flag) {
+            item.setChecked(!item.isChecked());
+            KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.FLAG_FAST_ENABLE, item.isChecked());
+        } else if (id == R.id.hostname_selection) {
+            openHostSelectionPopup();
+        } else if (id == R.id.send_username) {
+            item.setChecked(!item.isChecked());
+            KeelinkPreferences.setBoolean(getApplicationContext(), KeelinkPreferences.SEND_USERNAME_ENABLED, item.isChecked());
+        } else if (id == R.id.go_online) {
+            new SweetAlertDialog(MainActivity.this, SweetAlertDialog.NORMAL_TYPE)
                     .setTitleText("KeeLink")
-                    .setContentText("The other part of this application is placed online on https://keelink.cloud")
+                    .setContentText("The other part of this application is placed online on https://keelink.fly.dev")
                     .show();
-                break;
-            case R.id.howto:
-                openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/?show=howto&onlyinfo=true");
-                break;
-            case R.id.about:
-                openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/?show=credits&onlyinfo=true");
-                break;
-            case R.id.privacy:
-                openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/privacy-policy.html");
-                break;
-            default:
-                Log.w(TAG,"Not a valid ID");
+        } else if (id == R.id.howto) {
+            openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/?show=howto&onlyinfo=true");
+        } else if (id == R.id.about) {
+            openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/?show=credits&onlyinfo=true");
+        } else if (id == R.id.privacy) {
+            openBrowserWithUrl(KeelinkDefs.DEFAULT_TARGET_SITE + "/privacy-policy.html");
+        } else {
+            Log.w(TAG, "Not a valid ID");
         }
 
         return super.onOptionsItemSelected(item);
     }
+
 
     private void openBrowserWithUrl(String url) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -452,6 +435,7 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         //Check online
         try {
             pm.getPackageInfo("keepass2android.keepass2android", PackageManager.GET_ACTIVITIES);
+
             app_installed = true;
         }
         catch (PackageManager.NameNotFoundException e1) {
@@ -473,6 +457,8 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.setCaptureActivity(CustomCaptureActivity.class);
         integrator.setOrientationLocked(false);
+        String host = KeelinkPreferences.getString(getBaseContext(), KeelinkPreferences.HOSTNAME);
+        integrator.setPrompt("Scan QR code on " + host);
 
         integrator.initiateScan();
     }
@@ -586,11 +572,11 @@ public class MainActivity extends AppCompatActivity implements ActionMode.Callba
 
         int id = item.getItemId();
 
-        switch (id) {
-            case R.id.delete_menu_entry:
-                removeSelectedEntry();
-                mActionMode.finish();
-                return true;
+
+        if (id == R.id.delete_menu_entry) {
+            removeSelectedEntry();
+            mActionMode.finish();
+            return true;
         }
 
         return false;
