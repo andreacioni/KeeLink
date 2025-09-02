@@ -27,13 +27,14 @@
     <queries>
         <package android:name="keepass2android.keepass2android" />
         <package android:name="keepass2android.keepass2android_nonet" />
+        <package android:name="it.andreacioni.kp2a.plugin.keelink" />
     </queries>
 
 
     <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" tools:replace="android:icon,android:theme"
         android:label="@string/app_name" android:supportsRtl="true" android:theme="@style/AppTheme">
 
-        <activity android:name=".activity.MainActivity" android:label="@string/app_name"
+        <activity android:name=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,7 +46,7 @@
         <activity android:name=".activity.CustomCaptureActivity"
             android:screenOrientation="fullSensor"
             android:stateNotNeeded="true"
-            android:theme="@style/zxing_CaptureTheme"
+            android:theme="@style/QRScanActivity"
             android:windowSoftInputMode="stateAlwaysHidden">
 
         </activity>
